@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenaFood - Dashboard</title>
+    <style>
+        :root {
+            --sena-green: #28a745;
+            --sena-dark: #2e3b33;
+            --sena-light: #eaf3ed;
+            --sena-gold: #e0ac23;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--sena-green);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: var(--sena-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--sena-green);
+        }
+
+        /* Dashboard Content */
+        .container {
+            padding: 40px 10% ;
+            text-align: center;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        .welcome-card img { width: 80px; margin-bottom: 20px; }
+
+        .welcome-card h1 {
+            color: var(--sena-green);
+            margin-bottom: 15px;
+        }
+
+        .welcome-card p {
+            color: #666;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* Grid de Módulos */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .module-icon { font-size: 24px; color: #888; }
+
+        .module-text h3 { margin: 0 0 5px 0; font-size: 18px; color: #333; }
+        .module-text p { margin: 0; font-size: 13px; color: #888; }
+        .module-text a { 
+            display: inline-block;
+            margin-top: 8px;
+            color: #5c6bc0;
+            text-decoration: none;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo-area">
+            <span>🍽️</span>
+            <span style="color: var(--sena-gold)">SenaFOOD</span>
+        </div>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Productos</a>
+            <a href="#">Catálogo</a>
+            <a href="#">Inventario</a>
+            <a href="#">Proveedor</a>
+            <a href="#">O C</a>
+            <a href="#">Notificación</a>
+            <a href="#">PQRSF</a>
+        </div>
+        <div class="user-info" style="font-size: 14px; color: #666;">
+            👤 Bienvenido
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <div style="font-size: 50px;">🍽️</div>
+            <h1>¡Bienvenido a SenaFOOD!</h1>
+            <p>Explora la variedad y el sabor optimizando tu tiempo. Estamos aquí para ofrecerte una experiencia gastronómica eficiente y deliciosa.</p>
+            
+            <div class="modules-grid">
+                <div class="module-item">
+                    <span class="module-icon">📖</span>
+                    <div class="module-text">
+                        <h3>Catálogo</h3>
+                        <p>Ver productos disponibles.</p>
+                        <a href="#">Ir al catálogo →</a>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-icon">👥</span>
+                    <div class="module-text">
+                        <h3>Gestión de usuario</h3>
+                        <p>Administrar perfiles y permisos.</p>
+                        <a href="#">Configurar usuarios →</a>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-icon">🖼️</span>
+                    <div class="module-text">
+                        <h3>Gestión de pedidos</h3>
+                        <p>Seguimiento de órdenes en tiempo real.</p>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-icon">🔒</span>
+                    <div class="module-text">
+                        <h3>Autenticación</h3>
+                        <p>Configuración de seguridad y acceso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
