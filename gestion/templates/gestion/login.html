@@ -1,74 +1,28 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SenaFood - Iniciar Sesión</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #eaf3ed; /* Fondo verde claro */
-        }
-
-        .login-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            width: 320px;
-            border: 3px solid #28a745; /* El borde verde de tu diseño */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        h2 { color: #333; margin-bottom: 25px; }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #2e3b33; /* Color oscuro de tu botón de registro */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover { background-color: #3e4f45; }
-
-        .footer { margin-top: 20px; font-size: 14px; color: #666; }
-
-        .footer a {
-            color: #28a745;
-            text-decoration: none;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
 </head>
-<body>
+<body class="auth-body">
 
     <div class="login-container">
-        <div style="font-size: 40px; margin-bottom: 10px;">🍽️</div>
-        <div style="color: #e0ac23; font-weight: bold; margin-bottom: 20px;">SENA FOOD</div>
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
+        <div class="brand-text">SENA FOOD</div>
 
         <h2>Iniciar Sesión</h2>
+            {% if error %}
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-size: 14px;">
+            ⚠️ {{ error }}
+                </div>
+            {% endif %}
         
         <form method="POST">
             {% csrf_token %}
-            <input type="email" name="email" placeholder="Email" required>
+            <input type="email" name="email" placeholder="Email" value="{{ email_previo }}" required>
             <input type="password" name="password" placeholder="Contraseña" required>
             <button type="submit">ENTRAR</button>
         </form>

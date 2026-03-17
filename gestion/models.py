@@ -14,8 +14,8 @@ class Usuario(models.Model):
     telefono = models.CharField(max_length=255, blank=True, null=True)
     
     # LIMPIEZA: Dejamos solo los campos que usan db_column para asegurar la conexión con Workbench
-    tipo_identificacion = models.CharField(db_column='tipoIdentificacion', max_length=255, blank=True, null=True)
-    numero_identificacion = models.CharField(db_column='numeroIdentificacion', max_length=255, blank=True, null=True)
+    tipo_identificacion = models.CharField(db_column='tipo_identificacion', max_length=255, blank=True, null=True)
+    numero_identificacion = models.CharField(db_column='numero_identificacion', max_length=255, blank=True, null=True)
     
     # CORREGIDO: Relación real con la tabla Rol
     rol = models.ForeignKey('Rol', on_delete=models.CASCADE, db_column='id_rol')

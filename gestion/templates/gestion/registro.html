@@ -1,98 +1,42 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SenaFood - Registro</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            background-color: #eaf3ed; 
-            margin: 0; 
-        }
-        .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            border: 2px solid #28a745; 
-            width: 380px; 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
-        }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 12px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
-            box-sizing: border-box; 
-            font-size: 14px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);
-        }
-
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background-color: #2e3b33; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        
-        button:hover { background-color: #3e4f45; }
-        
-        .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
-        
-        .label-text {
-            font-size: 12px;
-            color: #28a745;
-            margin-bottom: 4px;
-            display: block;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
 </head>
-<body>
-    <div class="card">
-        <div style="text-align: center; font-size: 40px; margin-bottom: 10px;">🍽️</div>
+<body class="auth-body"> 
+        <div class="login-container"> <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
+        <div class="brand-text">SENA FOOD</div>
+        
         <h2>Crear Cuenta</h2>
         
         <form method="POST">
             {% csrf_token %}
-            
+    
             <input type="text" name="nombre" placeholder="Nombre" required>
             <input type="text" name="apellido" placeholder="Apellido" required>
-            
-            <span class="label-text">Identificación</span>
-            <select name="tipo_identificacion" required>
+    
+            <div style="text-align: left; margin-bottom: 5px; font-size: 13px; color: #666;">Identificación</div>
+            <select name="tipo_identificacion" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
                 <option value="CC">Cédula de Ciudadanía (CC)</option>
                 <option value="TI">Tarjeta de Identidad (TI)</option>
                 <option value="CE">Cédula de Extranjería (CE)</option>
             </select>
-            
+    
+            <input type="text" name="numero_identificacion" placeholder="Número de identificación" required>
+    
             <input type="text" name="telefono" placeholder="Número de teléfono" required>
             <input type="email" name="email" placeholder="Correo electrónico" required>
             <input type="password" name="password" placeholder="Contraseña segura" required>
-            
+    
             <button type="submit">REGISTRARME</button>
         </form>
         
         <div class="footer">
-            ¿Ya tienes cuenta? <a href="/login/" style="color: #28a745; font-weight: bold; text-decoration: none;">Inicia sesión</a>
+            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
         </div>
     </div>
 </body>

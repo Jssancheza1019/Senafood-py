@@ -7,4 +7,5 @@ urlpatterns = [
     # Cuando entres a /registro/ se ejecutará la función registro_view
     path('registro/', views.registro_view, name='registro'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('logout/', views.logout_view, name='logout'),
 ]
