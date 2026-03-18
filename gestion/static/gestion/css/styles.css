@@ -69,102 +69,11 @@ body {
     color: var(--sena-green);
 }
 
-/* --- AUTH (LOGIN / REGISTRO) --- */
-.auth-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: var(--sena-light);
-    padding: 20px;
-}
-
-.login-container {
-    background-color: var(--white);
-    padding: 35px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 380px; 
-    border-top: 5px solid var(--sena-green); 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    text-align: center;
-    height: auto; 
-    display: flex;
-    flex-direction: column;
-}
-
-.brand-text {
-    color: var(--sena-gold);
-    font-weight: 800;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-size: 1.1rem;
-}
-
-.login-logo {
-    width: 110px;
-    height: auto;
-    margin: 0 auto 10px;
-    display: block;
-    object-fit: contain;
-}
-
-h2 { 
-    color: var(--sena-dark); 
-    margin: 0 0 20px 0; 
-    font-size: 1.5rem;
-}
-
-/* --- FORMULARIOS --- */
-input, select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    box-sizing: border-box; 
-    font-size: 14px;
-    font-family: inherit;
-    transition: border-color 0.3s;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--sena-green);
-    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
-}
-
-select {
-    background-color: var(--white);
-    cursor: pointer;
-}
-
-button {
-    width: 100%;
-    padding: 13px;
-    background-color: var(--sena-dark);
-    color: var(--white);
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-    transition: var(--transition);
-    margin-top: 5px;
-    text-transform: uppercase;
-}
-
-button:hover {
-    background-color: #1e2722;
-    transform: translateY(-1px);
-}
-
 /* --- DASHBOARD --- */
 .container {
     padding: 40px 10%;
     max-width: 1200px;
-    margin: 0 auto; /* Centra el contenedor principal */
+    margin: 0 auto; 
 }
 
 .welcome-card {
@@ -172,17 +81,16 @@ button:hover {
     padding: 50px 40px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    text-align: center; /* Asegura el centrado de todo el contenido */
+    text-align: center; 
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* NUEVO: Logo proporcional al texto del saludo */
 .welcome-logo {
-    width: 80px;           /* Tamaño reducido para ser proporcional al H1 */
+    width: 80px; 
     height: auto;
-    margin-bottom: 15px;   /* Espacio respecto al título */
+    margin-bottom: 15px; 
     object-fit: contain;
     display: block;
 }
@@ -206,7 +114,7 @@ button:hover {
     gap: 25px;
     text-align: left;
     margin-top: 40px;
-    width: 100%; /* Ocupa todo el ancho de la tarjeta */
+    width: 100%; 
 }
 
 .module-item {
@@ -223,26 +131,185 @@ button:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-/* --- UTILIDADES --- */
-.footer { 
-    margin-top: 25px; 
-    font-size: 14px; 
-    color: #777; 
+/* --- MENU DESPLEGABLE USUARIO --- */
+.user-menu-container {
+    position: relative; 
+    display: inline-block;
 }
 
-.footer a {
-    color: var(--sena-green);
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.alert-error {
-    background-color: #fff5f5;
-    color: var(--danger);
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--danger);
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px;
     font-size: 14px;
+    font-weight: 600;
+    color: var(--sena-dark);
+}
+
+.arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.arrow.rotate {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    display: none; /* Oculto por defecto */
+    position: absolute;
+    right: 0;
+    top: 110%; 
+    background-color: var(--white);
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    z-index: 1000;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.dropdown-menu.show {
+    display: flex; /* Se muestra con el script */
+}
+
+.dropdown-item {
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #444;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.dropdown-item i {
+    color: var(--sena-green);
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-gray);
+    color: var(--sena-green);
+}
+
+/* Botón de Salir independiente */
+.logout-button {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid #eee;
+    color: var(--danger) !important;
+    padding: 12px 16px;
     text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #fff1f0;
+}
+
+.logout-button i {
+    color: var(--danger) !important;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 0;
+}
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+/* 2. DISEÑO DE ÉXITO ESTILO SENAFOOD (Verde Brillante + Check) */
+.alert-success-custom {
+    background-color: #d4edda; /* Un verde pastel suave */
+    color: #155724; /* Un verde oscuro para el texto */
+    border: 1px solid #c3e6cb; /* Borde sutil */
+    border-left: 4px solid var(--sena-green); /* Línea verde SENA a la izquierda */
+}
+
+/* Estilo para el icono del check dentro de la alerta */
+.alert-success-custom i {
+    color: var(--sena-green);
+    font-size: 18px;
+}
+
+/* --- ESTILOS PARA LOGIN Y AUTH (Añadir al final) --- */
+.auth-body {
+    background-color: var(--sena-light); /* Fondo verde clarito */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    border-top: 5px solid var(--sena-green);
+}
+
+.login-logo {
+    width: 120px; /* Esto arregla el logo gigante */
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.brand-text {
+    font-weight: 800;
+    color: var(--sena-gold);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+/* Estilos para los inputs del formulario */
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box; /* Evita que el input se salga del cuadro */
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--sena-dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.login-container button:hover {
+    background-color: var(--sena-green);
 }

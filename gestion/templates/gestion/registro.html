@@ -8,28 +8,65 @@
     <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
 </head>
 <body class="auth-body"> 
-        <div class="login-container"> <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
+    <div class="login-container"> 
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
         <div class="brand-text">SENA FOOD</div>
         
         <h2>Crear Cuenta</h2>
+
+        {% if error %}
+            <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
+                {{ error }}
+            </div>
+        {% endif %}
         
         <form method="POST">
             {% csrf_token %}
     
-            <input type="text" name="nombre" placeholder="Nombre" required>
-            <input type="text" name="apellido" placeholder="Apellido" required>
+            <input type="text" 
+            name="nombre" 
+            placeholder="Nombre" 
+            value="{{ nombre|default:'' }}" 
+            required
+            pattern="[A-Za-zÁéíóúÁÉÍÓÚñÑ\s]+" 
+            title="Solo se permiten letras"
+            oninput="this.value = this.value.replace(/[0-9]/g, '')">
+
+            <input type="text" 
+            name="apellido" 
+            placeholder="Apellido" 
+            value="{{ apellido|default:'' }}" 
+            required
+            pattern="[A-Za-zÁéíóúÁÉÍÓÚñÑ\s]+" 
+            title="Solo se permiten letras"
+            oninput="this.value = this.value.replace(/[0-9]/g, '')">
     
-            <div style="text-align: left; margin-bottom: 5px; font-size: 13px; color: #666;">Identificación</div>
+            <div style="text-align: left; margin-bottom: 5px; font-size: 13px; color: #666;">Tipo de Identificación</div>
             <select name="tipo_identificacion" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
-                <option value="CC">Cédula de Ciudadanía (CC)</option>
-                <option value="TI">Tarjeta de Identidad (TI)</option>
-                <option value="CE">Cédula de Extranjería (CE)</option>
+                <option value="CC" {% if tipo_id == 'CC' %}selected{% endif %}>Cédula de Ciudadanía (CC)</option>
+                <option value="TI" {% if tipo_id == 'TI' %}selected{% endif %}>Tarjeta de Identidad (TI)</option>
+                <option value="CE" {% if tipo_id == 'CE' %}selected{% endif %}>Cédula de Extranjería (CE)</option>
             </select>
     
-            <input type="text" name="numero_identificacion" placeholder="Número de identificación" required>
-    
-            <input type="text" name="telefono" placeholder="Número de teléfono" required>
-            <input type="email" name="email" placeholder="Correo electrónico" required>
+            <input type="text" 
+                name="numero_identificacion" 
+                placeholder="Número de identificación" 
+                value="{{ numero_identificacion|default:'' }}" 
+                required
+                pattern="\d+"
+                title="Ingrese solo números"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">    
+
+            <input type="text" 
+                name="telefono" 
+                placeholder="Número de teléfono" 
+                value="{{ telefono|default:'' }}" 
+                required
+                pattern="\d+"
+                title="Ingrese solo números"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+            <input type="email" name="email" placeholder="Correo electrónico" value="{{ email|default:'' }}" required>
             <input type="password" name="password" placeholder="Contraseña segura" required>
     
             <button type="submit">REGISTRARME</button>
