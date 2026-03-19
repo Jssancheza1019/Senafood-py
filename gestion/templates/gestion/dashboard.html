@@ -114,6 +114,8 @@
     </nav>
 
     <div class="container">
+        {% block content %} 
+        
         <div class="welcome-card">
             <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo" class="welcome-logo">
             <h1>¡Bienvenido a SenaFOOD!</h1>
@@ -133,7 +135,7 @@
                     <div class="module-text">
                         <h3>Gestión de usuario</h3>
                         <p>Administrar perfiles y permisos.</p>
-                        <a href="#">Configurar usuarios →</a>
+                        <a href="{% url 'usuarios_lista' %}" class="btn-link">Configurar usuarios →</a>
                     </div>
                 </div>
                 <div class="module-item">
@@ -152,7 +154,8 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        {% endblock %} </div>
 
 
     <script>
@@ -160,7 +163,7 @@
             const menu = document.getElementById('userDropdown');
             const arrow = document.getElementById('menuArrow');
             menu.classList.toggle('show');
-            arrow.classList.toggle('rotate'); // Gira la flecha si añadiste el CSS de rotación
+            arrow.classList.toggle('rotate'); 
         }
 
         window.onclick = function(event) {
