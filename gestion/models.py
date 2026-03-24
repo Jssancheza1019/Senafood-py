@@ -7,18 +7,12 @@ class Usuario(models.Model):
     nombre = models.CharField(max_length=255, blank=True, null=True)
     apellido = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(unique=True, max_length=255)
-    
-    # CORREGIDO: Renombramos a 'password' en Python, pero mantenemos 'contraseña' en la DB
-    password = models.CharField(db_column='contraseña', max_length=255)
-    
+    password = models.CharField(db_column='contraseña', max_length=255)   
     telefono = models.CharField(max_length=255, blank=True, null=True)
-    
-    # LIMPIEZA: Dejamos solo los campos que usan db_column para asegurar la conexión con Workbench
     tipo_identificacion = models.CharField(db_column='tipo_identificacion', max_length=255, blank=True, null=True)
     numero_identificacion = models.CharField(db_column='numero_identificacion', max_length=255, blank=True, null=True)
-    
-    # CORREGIDO: Relación real con la tabla Rol
     rol = models.ForeignKey('Rol', on_delete=models.CASCADE, db_column='id_rol')
+    es_activo = models.BooleanField(default=True, db_column='es_activo')
 
     # Auditoría automática
     create_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)

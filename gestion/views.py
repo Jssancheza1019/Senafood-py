@@ -31,70 +31,84 @@ def login_view(request):
         'email_previo': email_ingresado
     })
 
+
 def registro_view(request):
+    usuario_id = request.session.get('usuario_id')
+    es_admin = False
+    
+    if usuario_id:
+        try:
+            usuario_logueado = Usuario.objects.get(id_usuario=usuario_id)
+            if usuario_logueado.rol and usuario_logueado.rol.nombre_rol == 'Administrador':
+                es_admin = True
+        except Usuario.DoesNotExist:
+            es_admin = False
+
     if request.method == 'POST':
-        # 1. Recoger datos del formulario
+        # 1. Recoger datos
         nombre = request.POST.get('nombre')
         apellido = request.POST.get('apellido')
         email = request.POST.get('email')
-        password_ingresada = request.POST.get('password')
-        telefono = request.POST.get('telefono')
-        tipo_id = request.POST.get('tipo_identificacion')
         num_id = request.POST.get('numero_identificacion')
+        id_rol_seleccionado = request.POST.get('rol')
 
-        # 2. VALIDACIÓN: Verificar si el correo ya existe
+        # --- ESCUDO DE VALIDACIÓN (Evita error 1062) ---
+        
+        # Validar si el email ya existe
         if Usuario.objects.filter(email=email).exists():
             return render(request, 'gestion/registro.html', {
-                'error': 'Este correo ya está registrado.',
-                'nombre': nombre, 'apellido': apellido, 'email': email,
-                'telefono': telefono, 'numero_identificacion': num_id
+                'error': f'El correo "{email}" ya está registrado en SenaFood.',
+                'nombre': nombre, 'apellido': apellido, 'es_admin': es_admin,
+                'roles': Rol.objects.all() if es_admin else None
             })
 
-        # 3. VALIDACIÓN: Solo letras en Nombre y Apellido
-        # Permitimos espacios para nombres/apellidos compuestos
-        if not nombre.replace(" ", "").isalpha() or not apellido.replace(" ", "").isalpha():
+        # Validar si el número de identificación ya existe
+        if Usuario.objects.filter(numero_identificacion=num_id).exists():
             return render(request, 'gestion/registro.html', {
-                'error': 'El nombre y el apellido solo pueden contener letras.',
-                'nombre': nombre, 'apellido': apellido, 'email': email,
-                'telefono': telefono, 'numero_identificacion': num_id
+                'error': f'El número de documento "{num_id}" ya está registrado.',
+                'nombre': nombre, 'apellido': apellido, 'es_admin': es_admin,
+                'roles': Rol.objects.all() if es_admin else None
             })
-
-        # 4. VALIDACIÓN: Solo números en teléfono e identificación
-        if not telefono.isdigit() or not num_id.isdigit():
-            return render(request, 'gestion/registro.html', {
-                'error': 'El teléfono y la identificación deben contener solo números.',
-                'nombre': nombre, 'apellido': apellido, 'email': email,
-                'telefono': telefono, 'numero_identificacion': num_id
-            })
+        
+        # -----------------------------------------------
 
         try:
-            # 5. Lógica de guardado
-            rol_cliente, created = Rol.objects.get_or_create(nombre_rol='Cliente')
-            password_segura = make_password(password_ingresada)
+            # Lógica de asignación de Rol
+            if es_admin and id_rol_seleccionado:
+                rol_asignado = Rol.objects.get(id_rol=id_rol_seleccionado)
+            else:
+                rol_asignado, _ = Rol.objects.get_or_create(nombre_rol='Cliente')
 
+            # Guardado de Usuario
+            password_segura = make_password(request.POST.get('password'))
             nuevo_usuario = Usuario(
                 nombre=nombre,
                 apellido=apellido,
                 email=email,
                 password=password_segura,
-                telefono=telefono,
-                tipo_identificacion=tipo_id,
+                telefono=request.POST.get('telefono'),
+                tipo_identificacion=request.POST.get('tipo_identificacion'),
                 numero_identificacion=num_id,
-                rol=rol_cliente 
+                rol=rol_asignado 
             )
             nuevo_usuario.save()
             
-            messages.success(request, "¡Registro exitoso! Ya puedes iniciar sesión.")
-            return redirect('login')
+            messages.success(request, f"¡Usuario {nuevo_usuario.nombre} registrado correctamente!")
+            return redirect('usuarios_lista' if es_admin else 'login')
             
         except Exception as e:
             return render(request, 'gestion/registro.html', {
-                'error': f'Error al guardar: {e}',
-                'nombre': nombre, 'apellido': apellido, 'email': email,
-                'telefono': telefono, 'numero_identificacion': num_id
+                'error': f'Error inesperado: {e}',
+                'roles': Rol.objects.all() if es_admin else None,
+                'es_admin': es_admin
             })
             
-    return render(request, 'gestion/registro.html')
+    # GET
+    contexto = {
+        'roles': Rol.objects.all() if es_admin else None,
+        'es_admin': es_admin 
+    }
+    return render(request, 'gestion/registro.html', contexto)
 
 def dashboard_view(request):
     if 'usuario_nombre' not in request.session:
@@ -178,3 +192,11 @@ def cambiar_password_view(request):
 def logout_view(request):
     request.session.flush()
     return redirect('login')
+
+# En gestion/views.py
+
+# En gestion/views.py
+def lista_usuarios_view(request):
+    usuarios = Usuario.objects.all()
+    # Cambiamos la ruta para que coincida con tu carpeta y nombre de archivo
+    return render(request, 'usuarios/lista.html', {'usuarios': usuarios})

@@ -15,7 +15,7 @@
         <h2>Crear Cuenta</h2>
 
         {% if error %}
-            <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
+            <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px; border: 1px solid #f5c6cb;">
                 {{ error }}
             </div>
         {% endif %}
@@ -41,6 +41,18 @@
             title="Solo se permiten letras"
             oninput="this.value = this.value.replace(/[0-9]/g, '')">
     
+            {% if es_admin and roles %}
+                <div style="text-align: left; margin-bottom: 5px; font-size: 13px; color: #666;">Asignar Rol</div>
+                <select name="rol" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff;">
+                    <option value="" selected disabled>Seleccione un rol</option>
+                    {% for r in roles %}
+                        {% if r.nombre_rol != 'Cliente' %}
+                            <option value="{{ r.id_rol }}">{{ r.nombre_rol }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            {% endif %}
+
             <div style="text-align: left; margin-bottom: 5px; font-size: 13px; color: #666;">Tipo de Identificación</div>
             <select name="tipo_identificacion" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
                 <option value="CC" {% if tipo_id == 'CC' %}selected{% endif %}>Cédula de Ciudadanía (CC)</option>
@@ -69,11 +81,17 @@
             <input type="email" name="email" placeholder="Correo electrónico" value="{{ email|default:'' }}" required>
             <input type="password" name="password" placeholder="Contraseña segura" required>
     
-            <button type="submit">REGISTRARME</button>
+            <button type="submit" style="background-color: #28a745; color: white; font-weight: bold; cursor: pointer;">
+                {% if es_admin %}REGISTRAR USUARIO{% else %}REGISTRARME{% endif %}
+            </button>
         </form>
         
         <div class="footer">
-            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+            {% if es_admin %}
+                <a href="{% url 'usuarios_lista' %}" style="color: #666;">Volver a la lista</a>
+            {% else %}
+                ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+            {% endif %}
         </div>
     </div>
 </body>

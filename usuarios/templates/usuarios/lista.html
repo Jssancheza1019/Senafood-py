@@ -57,6 +57,8 @@
         font-size: 0.75rem;
     }
 
+    
+
     .title-list {
         color: #d35400; /* Color naranja/rojo del título de la imagen */
         font-weight: bold;
@@ -68,14 +70,26 @@
     <div class="card-sena">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="dropdown">
-                <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-file-alt"></i> Informes
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" id="exportExcel">Excel</a></li>
-                    <li><a class="dropdown-item" href="#" id="exportPDF">PDF</a></li>
-                </ul>
-            </div>
+    <button class="btn btn-success btn-sm dropdown-toggle" 
+            type="button" 
+            id="btnInformes" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+        <i class="fas fa-file-alt"></i> Informes
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="btnInformes">
+        <li>
+            <a class="dropdown-item" href="{% url 'exportar_excel' %}">
+                <i class="fas fa-file-excel text-success"></i> Excel
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'exportar_pdf' %}">
+                <i class="fas fa-file-pdf text-danger"></i> PDF
+            </a>
+        </li>
+    </ul>
+</div>
             
             <h4 class="title-list">Lista de Usuarios</h4>
 
@@ -107,10 +121,20 @@
                         <td class="text-center">{{ u.telefono }}</td>
                         <td>{{ u.tipo_identificacion }}: {{ u.numero_identificacion }}</td>
                         <td class="text-center">{{ u.rol.nombre_rol }}</td>
-                        <td class="text-center"><span class="badge-sena-activo">activo</span></td>
+                        <td class="text-center">{% if u.es_activo %}<span class="badge-sena-activo">Activo</span>
+                        {% else %}<span class="badge-sena-inactivo">Eliminado</span>
+                        {% endif %}
+                        </td>
                         <td class="text-center">
-                            <a href="#" class="btn-sena-edit text-decoration-none">Editar</a>
-                            <a href="#" class="btn-sena-delete text-decoration-none">Eliminar</a>
+                            <a href="{% url 'editar_usuario' u.id_usuario %}" class="btn btn-sm btn-warning">
+        <i class="fas fa-edit"></i>
+    </a>
+
+    <a href="{% url 'eliminar_usuario' u.id_usuario %}" 
+    class="btn btn-sm btn-danger" 
+    onclick="return confirm('¿Estás seguro de eliminar a {{ u.nombre }}? Esta acción no se puede deshacer.');">
+        <i class="fas fa-trash"></i>
+    </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -120,6 +144,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
