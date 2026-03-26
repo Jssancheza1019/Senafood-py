@@ -228,7 +228,7 @@
                 <label class="form-label">Rol del Usuario:</label>
                 <select name="rol" class="form-select" required>
                     {% for r in roles %}
-                    <option value="{{ r.id_rol }}" {% if r.id_rol==usuario.rol.id_rol %}selected{% endif %}>
+                    <option value="{{ r.id_rol }}" {% if r.id_rol == usuario.rol.id_rol %}selected{% endif %}>
                         {{ r.nombre_rol }}
                     </option>
                     {% endfor %}

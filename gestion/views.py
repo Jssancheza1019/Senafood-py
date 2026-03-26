@@ -197,6 +197,13 @@ def logout_view(request):
 
 # En gestion/views.py
 def lista_usuarios_view(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    usuario = Usuario.objects.get(id_usuario=request.session['usuario_id'])
     usuarios = Usuario.objects.all()
-    # Cambiamos la ruta para que coincida con tu carpeta y nombre de archivo
-    return render(request, 'usuarios/lista.html', {'usuarios': usuarios})
+    
+    return render(request, 'usuarios/lista.html', {
+        'usuarios': usuarios,
+        'nombre_usuario': usuario.nombre,
+    })
