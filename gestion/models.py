@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.db import models
+from pqrs.models import PQRSF
 
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -175,7 +176,7 @@ class Notificacion(models.Model):
     carrito = models.ForeignKey('Carrito', on_delete=models.CASCADE, db_column='id_carrito')
     
     # CORREGIDO: Conexión con PQRSF (usamos SET_NULL por si se borra el PQRSF, no perder la notificación)
-    pqrsf = models.ForeignKey('Pqrsf', on_delete=models.SET_NULL, db_column='id_pqrsf', blank=True, null=True)
+    pqrsf = models.ForeignKey(PQRSF, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         managed = True
@@ -236,22 +237,6 @@ class Permiso(models.Model):
     class Meta:
         managed = True
         db_table = 'permiso'
-
-
-class Pqrsf(models.Model):
-    id_pqrsf = models.BigAutoField(primary_key=True)
-    tipo = models.CharField(max_length=255)
-    descripcion = models.TextField(blank=True, null=True)
-    estado = models.CharField(max_length=255)
-    id_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True)
-    id_carrito = models.ForeignKey(Carrito, models.DO_NOTHING, db_column='id_carrito', blank=True, null=True)
-    create_at = models.DateTimeField(blank=True, null=True)
-    update_at = models.DateTimeField(blank=True, null=True)
-    leida = models.TextField()  # This field type is a guess.
-
-    class Meta:
-        managed = True
-        db_table = 'pqrsf'
 
 
 class Producto(models.Model):

@@ -1,0 +1,226 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    body, .container-fluid { font-family: 'Poppins', sans-serif; }
+
+    .page-title {
+        color: #28a745;
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin-bottom: 1.2rem;
+        letter-spacing: 0.3px;
+    }
+
+    .card-sena {
+        border-radius: 10px;
+        border: 1px solid #d4edda;
+        box-shadow: 0 2px 12px rgba(40, 167, 69, 0.07);
+        background-color: white;
+        padding: 1.5rem;
+    }
+
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .title-list {
+        color: #d35400;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-align: center;
+        flex: 1;
+    }
+
+    .btn-informes, .btn-nuevo {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .btn-informes:hover, .btn-nuevo:hover { background-color: #218838; color: white; }
+
+    .search-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #28a745;
+        border-radius: 20px;
+        padding: 4px 12px;
+        gap: 8px;
+    }
+
+    .search-wrapper label { color: white; font-size: 0.82rem; margin: 0; }
+
+    .search-wrapper input {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        color: white;
+        font-size: 0.85rem;
+        outline: none;
+        width: 140px;
+    }
+
+    /* Estilo para el botón tipo 'activo' de tu imagen */
+    .btn-ver-sena {
+        background-color: #28a745; /* Verde SENA */
+        color: white !important;
+        padding: 4px 18px;
+        border-radius: 20px; /* Hace que sea tipo cápsula */
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+        border: none;
+    }
+
+    .btn-ver-sena:hover {
+        background-color: #218838; /* Un verde un poco más oscuro al pasar el mouse */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+
+    /* Tabla Estilo SENA */
+    .table-sena-header { background-color: #28a745 !important; color: white !important; }
+    .table-sena-header th { font-size: 0.82rem; text-align: center; padding: 10px; border: 1px solid #218838 !important; }
+    
+    #tablaPQRSF { border: 2px solid #28a745 !important; }
+    #tablaPQRSF tbody td { border: 1px solid #a8d5b5 !important; vertical-align: middle; font-size: 0.85rem; }
+
+    /* Badges de Estado */
+    .badge-pendiente { background-color: #ffc107; color: #000; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
+    .badge-resuelta { background-color: #28a745; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
+    .badge-gestion { background-color: #17a2b8; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
+
+    /* DataTables Hiding */
+    div.dataTables_filter, .dataTables_length { display: none; }
+</style>
+
+<div class="container-fluid mt-4">
+    <h4 class="page-title">Gestión de PQRSF</h4>
+
+    <div class="card-sena">
+        <div class="toolbar">
+            <div class="dropdown">
+                <button class="btn-informes dropdown-toggle" type="button" id="btnExport" data-bs-toggle="dropdown">
+                    <i class="fas fa-file-download"></i> Informes ▼
+                </button>
+                <ul class="dropdown-menu shadow-sm">
+                    <li><a class="dropdown-item" href="{% url 'exportar_excel_pqrsf' %}"><i class="fas fa-file-excel text-success me-2"></i> Excel</a></li>
+                    <li><a class="dropdown-item" href="{% url 'exportar_pdf_pqrsf' %}"><i class="fas fa-file-pdf text-danger me-2"></i> PDF</a></li>
+                </ul>
+            </div>
+
+            <span class="title-list">Listado General de Solicitudes</span>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="search-wrapper">
+                    <label><i class="fas fa-search"></i> Buscar:</label>
+                    <input type="text" id="searchPQRSF" placeholder="Filtrar...">
+                </div>
+                <a href="{% url 'crear_pqrsf' %}" class="btn-nuevo">
+                    <i class="fas fa-plus-circle"></i> Nueva PQRSF
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tablaPQRSF" class="table table-sm table-hover">
+    <thead class="table-sena-header">
+        <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Usuario</th>
+            <th class="text-center">Leída</th> <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in pqrsf_list %}
+        <tr>
+            <td class="text-center fw-bold">{{ p.id_pqrsf }}</td>
+            
+            <td>{{ p.tipo }}</td> <td>
+                {% if p.usuario %}
+                    {{ p.usuario.nombre }}
+                {% else %}
+                    <span class="text-muted">ID: {{ p.id_usuario }}</span>
+                {% endif %}
+            </td> <td class="text-center">
+                {% if p.leida %}
+                    <span class="text-success fw-bold" style="font-size: 0.85rem;">Sí</span>
+                {% else %}
+                    <span class="text-danger fw-bold" style="font-size: 0.85rem;">No</span>
+                {% endif %}
+            </td>
+
+            <td class="text-center">
+                {% if p.estado == 'Pendiente' %}
+                    <span class="badge-pendiente">Pendiente</span>
+                {% elif p.estado == 'Resuelta' %}
+                    <span class="badge-resuelta">Resuelta</span>
+                {% else %}
+                    <span class="badge-gestion">{{ p.estado }}</span>
+                {% endif %}
+            </td>
+            
+            <td class="text-center">{{ p.create_at|date:"d/m/Y" }}</td>
+            
+            <td class="text-center">
+                <a href="{% url 'detalle_pqrsf' p.id_pqrsf %}" class="btn-ver-sena">
+                    Ver
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center py-4">No se encontraron solicitudes.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#tablaPQRSF').DataTable({
+            "pageLength": 10,
+            "order": [[ 0, "desc" ]],
+            "language": {
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ PQRSF",
+                "infoEmpty": "Sin registros",
+                "paginate": { "previous": "Anterior", "next": "Siguiente" }
+            }
+        });
+
+        $('#searchPQRSF').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+    });
+</script>
+{% endblock %}
