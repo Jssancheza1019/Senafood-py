@@ -2,112 +2,275 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-success fw-bold m-0"><i class="fas fa-file-invoice me-2"></i>Gestión de PQRSF #{{ pqrsf.id_pqrsf }}</h2>
-                <a href="{% url 'lista_pqrsf' %}" class="btn btn-outline-secondary rounded-pill px-4">
-                    <i class="fas fa-chevron-left me-1"></i> Volver
-                </a>
-            </div>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success alert-dismissible fade show rounded-pill px-4 mb-4" role="alert">
-                        <i class="fas fa-check-circle me-2"></i> {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+    body, .container-fluid { font-family: 'Poppins', sans-serif; }
 
-            <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px; border-left: 6px solid #28a745;">
-                <div class="card-body p-4">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <span class="text-muted small fw-bold">SOLICITANTE</span>
-                            <p class="h6"><i class="fas fa-user me-2 text-success"></i>{{ pqrsf.usuario.nombre }} {{ pqrsf.usuario.apellido }}</p>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <span class="text-muted small fw-bold">FECHA DE REGISTRO</span>
-                            <p class="h6"><i class="fas fa-calendar-alt me-2 text-success"></i>{{ pqrsf.create_at|date:"d/m/Y h:i a" }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <span class="text-muted small fw-bold">TIPO</span>
-                            <p class="h6"><span class="badge bg-light text-dark border">{{ pqrsf.tipo }}</span></p>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <span class="text-muted small fw-bold">ESTADO ACTUAL</span><br>
-                            <span class="badge rounded-pill px-3 py-2 {% if pqrsf.estado == 'Pendiente' %}bg-warning text-dark{% else %}bg-success{% endif %}">
-                                {{ pqrsf.estado }}
-                            </span>
-                        </div>
-                    </div>
+    .detalle-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+    }
 
-                    <div class="p-3 bg-light rounded" style="border: 1px dashed #28a745;">
-                        <label class="fw-bold text-success small mb-2 text-uppercase">Descripción del caso:</label>
-                        <p class="mb-0">{{ pqrsf.descripcion }}</p>
-                    </div>
+    .detalle-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        border-top: 5px solid #28a745;
+        width: 100%;
+        max-width: 650px;
+        padding: 40px;
+    }
+
+    .detalle-logo {
+        display: block;
+        width: 70px;
+        height: auto;
+        margin: 0 auto 10px auto;
+    }
+
+    .detalle-brand {
+        text-align: center;
+        font-weight: 800;
+        color: #e0ac23;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+
+    .detalle-titulo {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #2e3b33;
+        margin-bottom: 25px;
+    }
+
+    .detalle-field {
+        text-align: left;
+        margin-bottom: 16px;
+    }
+
+    .detalle-field label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #444;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .detalle-field .field-value {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background-color: #f4f4f4;
+        color: #555;
+        box-sizing: border-box;
+    }
+
+    .detalle-field textarea.field-value {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .detalle-field .field-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+        outline: none;
+    }
+
+    .detalle-field .field-input:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.15);
+    }
+
+    .detalle-field select.field-input {
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .badge-estado {
+        padding: 5px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-pendiente  { background-color: #ffc107; color: #000; }
+    .badge-leida      { background-color: #17a2b8; color: white; }
+    .badge-gestion    { background-color: #6f42c1; color: white; }
+    .badge-resuelta   { background-color: #28a745; color: white; }
+    .badge-cerrada    { background-color: #6c757d; color: white; }
+
+    .divider {
+        border: none;
+        border-top: 1px solid #eee;
+        margin: 24px 0;
+    }
+
+    .seccion-titulo {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #28a745;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-guardar {
+        width: 100%;
+        padding: 12px;
+        background-color: #2e3b33;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-guardar:hover { background-color: #28a745; }
+
+    .btn-volver {
+        display: block;
+        text-align: center;
+        margin-top: 14px;
+        color: #28a745;
+        font-size: 0.88rem;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .btn-volver:hover { text-decoration: underline; }
+
+    .info-readonly {
+        background-color: #f0fff4;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        color: #155724;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">PQRSF #{{ pqrsf.id_pqrsf }}</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background-color:#28a745; color:white; border-radius:8px; padding:10px 16px; font-size:0.85rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+                    <i class="fas fa-check-circle"></i> {{ message }}
                 </div>
-            </div>
+            {% endfor %}
+        {% endif %}
 
-            <div class="card shadow-sm border-0" style="border-radius: 15px;">
-                <div class="card-header bg-white p-4 border-0">
-                    <h5 class="fw-bold m-0 text-success"><i class="fas fa-reply me-2"></i>Respuesta y Seguimiento</h5>
-                </div>
-                <div class="card-body p-4 pt-0">
-                    <form method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Respuesta del Administrador:</label>
-                            <textarea name="respuesta" class="form-control border-success" rows="5" 
-                                    style="border-radius: 12px;" 
-                                    {% if rol != 'Administrador' %}disabled{% endif %}
-                                    placeholder="Aún no hay una respuesta registrada.">{% if pqrsf.respuesta %}{{ pqrsf.respuesta }}{% endif %}</textarea>
-                        </div>
+        <!-- Info del solicitante -->
+        <div class="seccion-titulo"><i class="fas fa-user"></i> Información del Solicitante</div>
 
-                        {% if rol == 'Administrador' %}
-                        <div class="row align-items-end">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <label class="form-label fw-bold">Cambiar Estado:</label>
-                                <select name="estado" class="form-select border-success rounded-pill">
-                                    {% for valor, etiqueta in estados %}
-                                        <option value="{{ valor }}" {% if pqrsf.estado == valor %}selected{% endif %}>
-                                            {{ etiqueta }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <button type="submit" class="btn btn-success rounded-pill px-5 shadow-sm">
-                                    <i class="fas fa-save me-2"></i> Guardar Cambios
-                                </button>
-                            </div>
-                        </div>
-                        {% else %}
-                            <div class="alert alert-info rounded-pill py-2 px-4">
-                                <i class="fas fa-info-circle me-2"></i> Solo el administrador puede modificar esta solicitud.
-                            </div>
-                        {% endif %}
-                    </form>
-                </div>
-            </div>
-
+        <div class="detalle-field">
+            <label>Solicitante</label>
+            <div class="field-value">{{ pqrsf.usuario.nombre }} {{ pqrsf.usuario.apellido }}</div>
         </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Tipo</label>
+                <div class="field-value">{{ pqrsf.tipo }}</div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Estado</label>
+                <div class="field-value" style="background:transparent; border:none; padding:6px 0;">
+                    {% if pqrsf.estado == 'Pendiente' %}
+                        <span class="badge-estado badge-pendiente">Pendiente</span>
+                    {% elif pqrsf.estado == 'Leída' %}
+                        <span class="badge-estado badge-leida">Leída</span>
+                    {% elif pqrsf.estado == 'En gestión' %}
+                        <span class="badge-estado badge-gestion">En gestión</span>
+                    {% elif pqrsf.estado == 'Resuelta' %}
+                        <span class="badge-estado badge-resuelta">Resuelta</span>
+                    {% elif pqrsf.estado == 'Cerrada' %}
+                        <span class="badge-estado badge-cerrada">Cerrada</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Fecha de Registro</label>
+            <div class="field-value">{{ pqrsf.create_at|date:"d/m/Y h:i a" }}</div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Descripción</label>
+            <div class="field-value" style="white-space:pre-wrap;">{{ pqrsf.descripcion }}</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Respuesta -->
+        <div class="seccion-titulo"><i class="fas fa-reply"></i> Respuesta y Seguimiento</div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="detalle-field">
+                <label>Respuesta del Administrador</label>
+                {% if rol == 'Administrador' %}
+                    <textarea name="respuesta" class="field-input" rows="5"
+                        placeholder="Escribe aquí la respuesta...">{% if pqrsf.respuesta %}{{ pqrsf.respuesta }}{% endif %}</textarea>
+                {% else %}
+                    <div class="field-value" style="white-space:pre-wrap; min-height:80px;">
+                        {% if pqrsf.respuesta %}{{ pqrsf.respuesta }}{% else %}<span style="color:#aaa;">Sin respuesta aún.</span>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if rol == 'Administrador' %}
+            <div class="detalle-field">
+                <label>Cambiar Estado</label>
+                <select name="estado" class="field-input">
+                    {% for valor, etiqueta in estados %}
+                        <option value="{{ valor }}" {% if pqrsf.estado == valor %}selected{% endif %}>
+                            {{ etiqueta }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-guardar">
+                <i class="fas fa-save me-2"></i> GUARDAR CAMBIOS
+            </button>
+            {% else %}
+                <div class="info-readonly">
+                    <i class="fas fa-info-circle"></i>
+                    Solo el administrador puede modificar esta solicitud.
+                </div>
+            {% endif %}
+        </form>
+
+        <a href="{% url 'lista_pqrsf' %}" class="btn-volver">← Volver a la Lista</a>
+
     </div>
 </div>
 
-<style>
-    .form-control:focus, .form-select:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
-    }
-    .card { background-color: white; }
-    body { background-color: #f8f9fa; }
-</style>
 {% endblock %}

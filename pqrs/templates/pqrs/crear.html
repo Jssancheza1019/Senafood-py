@@ -2,87 +2,189 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-            
-            <h2 class="text-success fw-bold mb-4">
-                <i class="fas fa-plus-circle me-2"></i>Nueva Solicitud PQRSF
-            </h2>
-
-            <div class="card shadow-sm border-0" style="border-radius: 15px; border-top: 5px solid #28a745 !important;">
-                <div class="card-body p-4 p-md-5">
-                    
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show rounded-pill px-4" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <p class="text-muted mb-4">
-                        Hola <strong>{{ nombre_usuario }}</strong>, cuéntanos qué sucede. Tu solicitud será revisada por un administrador.
-                    </p>
-
-                    <form method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-dark">Tipo de Solicitud</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-success text-white border-success">
-                                    <i class="fas fa-list-ul"></i>
-                                </span>
-                                <select name="tipo" class="form-select border-success" required>
-                                    <option value="" selected disabled>Seleccione el tipo...</option>
-                                    {% for valor, etiqueta in tipos %}
-                                        <option value="{{ valor }}">{{ etiqueta }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-dark">Descripción de la situación</label>
-                            <textarea name="descripcion" class="form-control border-success" rows="6" 
-                                    placeholder="Describe aquí los detalles de tu petición, queja o reclamo..." 
-                                    style="border-radius: 10px;" required></textarea>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'lista_pqrsf' %}" class="btn btn-outline-secondary rounded-pill px-4">
-                                <i class="fas fa-times me-1"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-success rounded-pill px-5 shadow-sm">
-                                <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    /* Estilos para mantener la coherencia con SenaFOOD */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    body { font-family: 'Poppins', sans-serif; background-color: #f0f7f0; }
+
+    .wrapper-crear {
+    min-height: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem;
+    }
+
+    .card-crear {
+        background: white;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        max-width: 480px;
+        width: 100%;
+        border-top: 5px solid #28a745;
+    }
+
+    .card-logo { text-align: center; margin-bottom: 0.3rem; }
+    .card-logo img { width: 90px; height: 90px; object-fit: contain; }
+
+    .card-brand {
+        text-align: center;
+        color: #d4820a;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #1a1a1a;
+        margin-bottom: 0.4rem;
+    }
+
+    .card-subtitle {
+        text-align: center;
+        font-size: 0.83rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #d0d0d0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        padding: 10px 14px;
+        color: #333;
+        background-color: #fff;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
     .form-control:focus, .form-select:focus {
         border-color: #28a745;
-        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+        box-shadow: 0 0 0 3px rgba(40,167,69,0.12);
+        outline: none;
     }
-    .input-group-text {
-        border-radius: 10px 0 0 10px !important;
+
+    textarea.form-control { resize: vertical; min-height: 130px; }
+
+    .btn-enviar {
+        background-color: #1a3a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        width: 100%;
+        text-transform: uppercase;
+        transition: background 0.2s;
+        margin-top: 0.5rem;
     }
-    .form-select {
-        border-radius: 0 10px 10px 0 !important;
+    .btn-enviar:hover { background-color: #28a745; }
+
+    .btn-cancelar {
+        display: block;
+        text-align: center;
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        color: #28a745;
+        text-decoration: none;
+        font-weight: 500;
     }
-    .card {
-        background-color: #ffffff;
+    .btn-cancelar:hover { text-decoration: underline; color: #218838; }
+
+    .alerta-exito {
+        background-color: #f0fff4;
+        border: 1px solid #28a745;
+        border-left: 4px solid #28a745;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        color: #1a5c2a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1rem;
     }
-    body {
-        background-color: #f8f9fa;
+
+    .alerta-error {
+        background-color: #fff5f5;
+        border: 1px solid #dc3545;
+        border-left: 4px solid #dc3545;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        color: #7b1d1d;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1rem;
     }
 </style>
+
+<div class="wrapper-crear">
+    <div class="card-crear">
+
+        <div class="card-logo">
+            <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFOOD">
+        </div>
+
+        <div class="card-brand">SenaFOOD</div>
+        <div class="card-title">Nueva Solicitud PQRSF</div>
+        <div class="card-subtitle">
+            Hola <strong>{{ nombre_usuario }}</strong>, cuéntanos qué sucede.<br>
+            Tu solicitud será revisada por un administrador.
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alerta-exito"><i class="fas fa-check-circle"></i> {{ message }}</div>
+                {% else %}
+                    <div class="alerta-error"><i class="fas fa-exclamation-triangle"></i> {{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="d-flex flex-column gap-3">
+            {% csrf_token %}
+
+            <div>
+                <label class="form-label">Tipo de Solicitud:</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="" disabled selected>Seleccione el tipo...</option>
+                    {% for valor, etiqueta in tipos %}
+                        <option value="{{ valor }}">{{ etiqueta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label">Descripción:</label>
+                <textarea name="descripcion" class="form-control"
+                    placeholder="Describe aquí los detalles de tu solicitud..."
+                    required></textarea>
+            </div>
+
+            <button type="submit" class="btn-enviar">
+                <i class="fas fa-paper-plane me-2"></i> Enviar Solicitud
+            </button>
+
+            <a href="{% url 'lista_pqrsf' %}" class="btn-cancelar">
+                ← Volver a la Lista
+            </a>
+        </form>
+    </div>
+</div>
 {% endblock %}

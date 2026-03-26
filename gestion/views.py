@@ -20,6 +20,7 @@ def login_view(request):
                 # Guardamos ID y Nombre para usarlos en todo el sistema
                 request.session['usuario_id'] = usuario.id_usuario
                 request.session['usuario_nombre'] = usuario.nombre
+                request.session['usuario_rol'] = usuario.rol.nombre_rol
                 return redirect('dashboard')
             else:
                 error_mensaje = "Contraseña incorrecta."

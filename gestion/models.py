@@ -161,33 +161,6 @@ class MovimientosInventario(models.Model):
         managed = True
         db_table = 'movimientos_inventario'
 
-
-class Notificacion(models.Model):
-    id_notificacion = models.AutoField(primary_key=True)
-    mensaje = models.TextField(blank=True, null=True)
-    
-    # Usamos auto_now_add para que la fecha se ponga sola al enviar la notificación
-    fechaenvio = models.DateTimeField(db_column='fechaEnvio', auto_now_add=True, blank=True, null=True)
-
-    # CORREGIDO: Ahora se conecta con el modelo Usuario
-    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='idUsuario')
-    
-    # CORREGIDO: Conexión con el Carrito
-    carrito = models.ForeignKey('Carrito', on_delete=models.CASCADE, db_column='id_carrito')
-    
-    # CORREGIDO: Conexión con PQRSF (usamos SET_NULL por si se borra el PQRSF, no perder la notificación)
-    pqrsf = models.ForeignKey(PQRSF, on_delete=models.CASCADE, null=True, blank=True)
-
-    class Meta:
-        managed = True
-        db_table = 'notificacion'
-        verbose_name = 'Notificación'
-        verbose_name_plural = 'Notificaciones'
-
-    def __str__(self):
-        return f"Notificación para {self.usuario.nombre}: {self.mensaje[:20]}..."
-
-
 class Ordencompra(models.Model):
     id_orden = models.BigAutoField(primary_key=True)
     fecha = models.DateField(blank=True, null=True)

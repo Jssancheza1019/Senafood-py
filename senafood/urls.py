@@ -6,4 +6,5 @@ urlpatterns = [
     path('', include('gestion.urls')), #ruta para gestion 
     path('usuarios/', include('usuarios.urls')), # ruta para usuarios
     path('pqrsf/', include('pqrs.urls')),# ruta de pqrsf
+    path('notificaciones/', include('notificaciones.urls')), # ruta notificaciones
 ]

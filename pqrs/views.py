@@ -11,6 +11,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from django.utils import timezone
 from django.utils.timezone import localtime
+from notificaciones.models import Notificacion
 
 
 def get_usuario_session(request): #Helper para obtener usuario y su rol desde la sesión.
@@ -81,6 +82,15 @@ def detalle_pqrsf_view(request, id):
         pqrsf.respuesta = request.POST.get('respuesta', '')
         pqrsf.estado = request.POST.get('estado', pqrsf.estado)
         pqrsf.save()
+
+        # ✅ Notificar al usuario dueño del PQRSF
+        Notificacion.objects.create(
+            usuario=pqrsf.usuario,
+            mensaje=f"Tu PQRSF #{pqrsf.id_pqrsf} fue respondida. Estado: {pqrsf.estado}",
+            tipo='pqrsf',
+            pqrsf=pqrsf,
+        )
+
         messages.success(request, 'PQRSF actualizada correctamente.')
         return redirect('detalle_pqrsf', id=id)
 
@@ -109,13 +119,24 @@ def crear_pqrsf_view(request):
                 'tipos': PQRSF.TIPO_CHOICES,
             })
 
-        PQRSF.objects.create(
+        nueva_pqrsf = PQRSF.objects.create(
             tipo=tipo,
             descripcion=descripcion,
             estado='Pendiente',
             usuario=usuario,
             leida=False,
         )
+
+        # Notificar a todos los administradores
+        admins = Usuario.objects.filter(rol__nombre_rol='Administrador', es_activo=True)
+        for admin in admins:
+            Notificacion.objects.create(
+                usuario=admin,
+                mensaje=f"Nueva PQRSF de {usuario.nombre} {usuario.apellido}: {tipo}",
+                tipo='pqrsf',
+                pqrsf=nueva_pqrsf,  # ✅ esto faltaba
+            )
+
         messages.success(request, '¡PQRSF creada correctamente!')
         return redirect('lista_pqrsf')
 
@@ -124,7 +145,6 @@ def crear_pqrsf_view(request):
         'rol': rol,
         'tipos': PQRSF.TIPO_CHOICES,
     })
-
 
 def exportar_excel_pqrsf(request):
     usuario_session, rol = get_usuario_session(request)
