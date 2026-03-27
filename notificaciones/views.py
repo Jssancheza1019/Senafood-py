@@ -18,21 +18,24 @@ def contar_notificaciones(request):
 def lista_notificaciones(request):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
-        from django.shortcuts import redirect
         return redirect('login')
 
+    # Primero obtén las notificaciones (aún con leida=False)
     notificaciones = Notificacion.objects.filter(
         usuario_id=usuario_id
     ).order_by('-fechaenvio')
 
-    # Marcar todas como leídas al abrir la página
+    # Renderiza primero
+    response = render(request, 'notificaciones/lista.html', {
+        'notificaciones': notificaciones,
+        'nombre_usuario': request.session.get('usuario_nombre', ''),
+        'rol_usuario': request.session.get('usuario_rol', ''),
+    })
+
+    # Luego marca como leídas
     Notificacion.objects.filter(
         usuario_id=usuario_id,
         leida=False
     ).update(leida=True)
 
-    return render(request, 'notificaciones/lista.html', {
-        'notificaciones': notificaciones,
-        'nombre_usuario': request.session.get('usuario_nombre', ''),
-        'rol_usuario': request.session.get('usuario_rol', ''),
-    })
+    return response

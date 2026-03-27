@@ -379,6 +379,8 @@
         font-size: 0.82rem;
         color: #555;
     }
+
+    
 </style>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -386,9 +388,9 @@
 <div class="container-fluid mt-4">
     <h4 class="page-title">
         {% if rol == 'Administrador' %}
-            Gestión de PQRSF
+        Gestión de PQRSF
         {% else %}
-            Mis PQRSF
+        Mis PQRSF
         {% endif %}
     </h4>
 
@@ -541,7 +543,11 @@
                     </tr>
                     {% empty %}
                     <tr>
+                        {% if rol == 'Administrador' %}
                         <td colspan="9" class="text-center py-4 text-muted">No se encontraron solicitudes.</td>
+                        {% else %}
+                        <td colspan="8" class="text-center py-4 text-muted">No se encontraron solicitudes.</td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -558,8 +564,13 @@
 <script>
     $(document).ready(function () {
         var table = $('#tablaPQRSF').DataTable({
+            "destroy": true,
+            "pageLength": 10,
             "pageLength": 10,
             "order": [[0, "desc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": -1 }
+            ],
             "language": {
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
                 "infoEmpty": "Sin registros",

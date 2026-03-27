@@ -254,14 +254,23 @@ hr {
     font-size: 18px;
 }
 
-/* --- ESTILOS PARA LOGIN Y AUTH (Añadir al final) --- */
 .auth-body {
-    background-color: var(--sena-light); /* Fondo verde clarito */
+    background-color: var(--sena-light);
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    align-items: flex-start;
+    min-height: calc(100vh - 70px);
+    padding: 40px 20px;
     margin: 0;
+    width: 100vw;        /* ✅ ancho completo de la ventana */
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+}
+
+.container {
+    padding: 0;  /* temporalmente para probar */
 }
 
 .login-container {

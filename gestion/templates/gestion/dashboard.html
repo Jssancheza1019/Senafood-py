@@ -134,53 +134,55 @@
         </div>
     </nav>
 
-    <div class="container">
-        {% block content %}
+    {% block full_content %}{% endblock %}
 
-        <div class="welcome-card">
-            <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo" class="welcome-logo">
-            <h1>¡Bienvenido a SenaFOOD!</h1>
-            <p>Explora la variedad y el sabor optimizando tu tiempo. Estamos aquí para ofrecerte una experiencia
-                gastronómica eficiente y deliciosa.</p>
+<div class="container">
+    {% block content %}
 
-            <div class="modules-grid">
-                <div class="module-item">
-                    <span class="module-icon">📖</span>
-                    <div class="module-text">
-                        <h3>Catálogo</h3>
-                        <p>Ver productos disponibles.</p>
-                        <a href="#">Ir al catálogo →</a>
-                    </div>
+    <div class="welcome-card">
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo" class="welcome-logo">
+        <h1>¡Bienvenido a SenaFOOD!</h1>
+        <p>Explora la variedad y el sabor optimizando tu tiempo. Estamos aquí para ofrecerte una experiencia
+            gastronómica eficiente y deliciosa.</p>
+
+        <div class="modules-grid">
+            <div class="module-item">
+                <span class="module-icon">📖</span>
+                <div class="module-text">
+                    <h3>Catálogo</h3>
+                    <p>Ver productos disponibles.</p>
+                    <a href="#">Ir al catálogo →</a>
                 </div>
-                {% if rol_usuario == 'Administrador' %}
-                <div class="module-item">
-                    <span class="module-icon">👥</span>
-                    <div class="module-text">
-                        <h3>Gestión de usuario</h3>
-                        <p>Administrar perfiles y permisos.</p>
-                        <a href="{% url 'usuarios_lista' %}" class="btn-link">Configurar usuarios →</a>
-                    </div>
+            </div>
+            {% if rol_usuario == 'Administrador' %}
+            <div class="module-item">
+                <span class="module-icon">👥</span>
+                <div class="module-text">
+                    <h3>Gestión de usuario</h3>
+                    <p>Administrar perfiles y permisos.</p>
+                    <a href="{% url 'usuarios_lista' %}" class="btn-link">Configurar usuarios →</a>
                 </div>
-                {% endif %}
-                <div class="module-item">
-                    <span class="module-icon">🖼️</span>
-                    <div class="module-text">
-                        <h3>Gestión de pedidos</h3>
-                        <p>Seguimiento de órdenes en tiempo real.</p>
-                    </div>
+            </div>
+            {% endif %}
+            <div class="module-item">
+                <span class="module-icon">🖼️</span>
+                <div class="module-text">
+                    <h3>Gestión de pedidos</h3>
+                    <p>Seguimiento de órdenes en tiempo real.</p>
                 </div>
-                <div class="module-item">
-                    <span class="module-icon">🔒</span>
-                    <div class="module-text">
-                        <h3>Autenticación</h3>
-                        <p>Configuración de seguridad y acceso.</p>
-                    </div>
+            </div>
+            <div class="module-item">
+                <span class="module-icon">🔒</span>
+                <div class="module-text">
+                    <h3>Autenticación</h3>
+                    <p>Configuración de seguridad y acceso.</p>
                 </div>
             </div>
         </div>
-
-        {% endblock %}
     </div>
+
+    {% endblock %}
+</div>
 
 
     <script>

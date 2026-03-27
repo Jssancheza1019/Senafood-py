@@ -1,81 +1,64 @@
+{% extends 'gestion/dashboard.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SenaFOOD - Mis Datos</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
-</head>
-<body>
-    <div class="auth-body">
-        <div class="login-container" style="max-width: 500px;">
-            <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="login-logo">
-            <div class="brand-text">SenaFOOD</div>
-            <h2>Mis Datos Personales</h2>
 
-            {% if messages %}
-                {% for message in messages %}
-                    {% if message.tags == 'success' %}
-                        <div class="alert alert-success-custom">
-                            <i class="fas fa-check-circle"></i> {{ message }}
-                        </div>
-                    {% else %}
-                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                            <i class="fas fa-exclamation-triangle"></i> {{ message }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+{% block full_content %}
+<div class="auth-body">
+    <div class="login-container" style="max-width: 500px;">
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="login-logo">
+        <div class="brand-text">SenaFOOD</div>
+        <h2>Mis Datos Personales</h2>
 
-            <form action="{% url 'perfil' %}" method="POST">
-                {% csrf_token %}
-                
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <label><strong>Nombre completo:</strong></label>
-                    <input type="text" value="{{ usuario.nombre }} {{ usuario.apellido }}" disabled style="background-color: #f4f4f4; color: #777;">
-                    <small style="color: #666; font-size: 12px; display:block; margin-top: 5px;">(El nombre no es editable)</small>
-                </div>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert alert-success-custom">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-exclamation-triangle"></i> {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <label><strong>Correo Electrónico:</strong></label>
-                    <input type="email" name="email" value="{{ usuario.email }}" required>
-                </div>
+        <form action="{% url 'perfil' %}" method="POST">
+            {% csrf_token %}
 
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <label><strong>Teléfono:</strong></label>
-                    <input type="text" 
-                        name="telefono" 
-                        value="{{ usuario.telefono }}" 
-                        required 
-                        pattern="\d+" 
-                        title="Por favor, ingrese solo números"
+            <div style="text-align:left; margin-bottom:15px;">
+                <label><strong>Nombre completo:</strong></label>
+                <input type="text" value="{{ usuario.nombre }} {{ usuario.apellido }}" disabled style="background-color:#f4f4f4; color:#777;">
+                <small style="color:#666; font-size:12px; display:block; margin-top:5px;">(El nombre no es editable)</small>
+            </div>
+
+            <div style="text-align:left; margin-bottom:15px;">
+                <label><strong>Correo Electrónico:</strong></label>
+                <input type="email" name="email" value="{{ usuario.email }}" required>
+            </div>
+
+            <div style="text-align:left; margin-bottom:15px;">
+                <label><strong>Teléfono:</strong></label>
+                <input type="text" name="telefono" value="{{ usuario.telefono }}" required
+                    pattern="\d+" title="Solo números"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div style="text-align:left; margin-bottom:15px;">
+                <label><strong>Identificación:</strong></label>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" value="{{ usuario.tipo_identificacion }}" disabled style="width:25%; background-color:#f4f4f4; color:#777;">
+                    <input type="text" name="numero_identificacion" value="{{ usuario.numero_identificacion }}"
+                        required style="width:75%;" pattern="\d+" title="Solo números"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
+            </div>
 
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <label><strong>Identificación:</strong></label>
-                    <div style="display: flex; gap: 5px;">
-                        <input type="text" value="{{ usuario.tipo_identificacion }}" disabled style="width: 25%; background-color: #f4f4f4; color: #777;">
-                        <input type="text" 
-                            name="numero_identificacion" 
-                            value="{{ usuario.numero_identificacion }}" 
-                            required 
-                            style="width: 75%;"
-                            pattern="\d+" 
-                            title="Por favor, ingrese solo números"
-                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    </div>
-                </div>
+            <button type="submit" style="margin-top:25px;">GUARDAR CAMBIOS</button>
 
-                <button type="submit" style="margin-top: 25px;">GUARDAR CAMBIOS</button>
-                
-                <div class="footer">
-                    <a href="{% url 'dashboard' %}">← Volver al Inicio</a>
-                </div>
-            </form>
-        </div>
+            <div class="footer">
+                <a href="{% url 'dashboard' %}">← Volver al Inicio</a>
+            </div>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -5,7 +5,10 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-    body, .container-fluid { font-family: 'Poppins', sans-serif; }
+    body,
+    .container-fluid {
+        font-family: 'Poppins', sans-serif;
+    }
 
     .page-title {
         color: #28a745;
@@ -17,7 +20,7 @@
     .card-sena {
         border-radius: 10px;
         border: 1px solid #d4edda;
-        box-shadow: 0 2px 12px rgba(40,167,69,0.07);
+        box-shadow: 0 2px 12px rgba(40, 167, 69, 0.07);
         background-color: white;
         padding: 1.5rem;
     }
@@ -48,12 +51,16 @@
         gap: 8px;
     }
 
-    .search-wrapper label { color: white; font-size: 0.82rem; margin: 0; }
+    .search-wrapper label {
+        color: white;
+        font-size: 0.82rem;
+        margin: 0;
+    }
 
     .search-wrapper input {
         background: transparent;
         border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.6);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
         color: white;
         font-size: 0.85rem;
         outline: none;
@@ -61,9 +68,14 @@
         padding: 2px 4px;
     }
 
-    .search-wrapper input::placeholder { color: rgba(255,255,255,0.7); }
+    .search-wrapper input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
 
-    .table-sena-header { background-color: #28a745 !important; color: white !important; }
+    .table-sena-header {
+        background-color: #28a745 !important;
+        color: white !important;
+    }
 
     .table-sena-header th {
         font-weight: 600;
@@ -75,12 +87,28 @@
         white-space: nowrap;
     }
 
-    .table tbody td { vertical-align: middle; font-size: 0.85rem; padding: 7px 8px; }
-    .table tbody tr:hover { background-color: #f0fff4; }
+    .table tbody td {
+        vertical-align: middle;
+        font-size: 0.85rem;
+        padding: 7px 8px;
+    }
 
-    #tablaNotif { border: 2px solid #28a745 !important; border-collapse: collapse; }
-    #tablaNotif thead th { border: 1px solid #218838 !important; }
-    #tablaNotif tbody td { border: 1px solid #a8d5b5 !important; }
+    .table tbody tr:hover {
+        background-color: #f0fff4;
+    }
+
+    #tablaNotif {
+        border: 2px solid #28a745 !important;
+        border-collapse: collapse;
+    }
+
+    #tablaNotif thead th {
+        border: 1px solid #218838 !important;
+    }
+
+    #tablaNotif tbody td {
+        border: 1px solid #a8d5b5 !important;
+    }
 
     .badge-tipo {
         padding: 3px 12px;
@@ -90,20 +118,37 @@
         display: inline-block;
     }
 
-    .badge-pqrsf    { background-color: #6f42c1; color: white; }
-    .badge-stock    { background-color: #fd7e14; color: white; }
-    .badge-sistema  { background-color: #17a2b8; color: white; }
+    .badge-pqrsf {
+        background-color: #6f42c1;
+        color: white;
+    }
+
+    .badge-stock {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    .badge-sistema {
+        background-color: #17a2b8;
+        color: white;
+    }
 
     .badge-leida-si {
-        background-color: #28a745; color: white;
-        padding: 3px 12px; border-radius: 20px;
-        font-size: 0.75rem; font-weight: 500;
+        background-color: #28a745;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
     .badge-leida-no {
-        background-color: #dc3545; color: white;
-        padding: 3px 12px; border-radius: 20px;
-        font-size: 0.75rem; font-weight: 500;
+        background-color: #dc3545;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
     .btn-accion-ver {
@@ -121,10 +166,30 @@
         transition: background 0.2s;
     }
 
-    .btn-accion-ver:hover { background-color: #218838; color: white; }
+    .btn-accion-ver:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    #tablaNotif {
+        width: 100% !important;
+        margin: 0 auto;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_scroll,
+    .dataTables_scrollBody {
+        width: 100% !important;
+    }
+
+    .dataTables_wrapper {
+        width: 100%;
+    }
 
     div.dataTables_filter,
-    .dataTables_wrapper .dataTables_length { display: none; }
+    .dataTables_wrapper .dataTables_length {
+        display: none;
+    }
 
     .dataTables_wrapper .dataTables_paginate {
         display: flex;
@@ -160,7 +225,19 @@
         color: #28a745 !important;
     }
 
-    .dataTables_wrapper .dataTables_info { font-size: 0.82rem; color: #555; }
+    .dataTables_wrapper .dataTables_info {
+        font-size: 0.82rem;
+        color: #555;
+    }
+
+    #tablaNotif tbody tr.no-leida td {
+        background-color: #fffde7 !important;
+        font-weight: 600;
+    }
+
+    #tablaNotif tbody tr.no-leida:hover td {
+        background-color: #fff9c4 !important;
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -179,56 +256,48 @@
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive w-100">
             <table id="tablaNotif" class="table table-sm table-hover table-bordered">
                 <thead class="table-sena-header">
                     <tr>
                         <th>#</th>
                         <th>Tipo</th>
                         <th>Mensaje</th>
-                        <th>Leída</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for n in notificaciones %}
-                    <tr>
+                    <tr {% if not n.leida %}class="no-leida" {% endif %}>
                         <td class="text-center fw-bold">{{ n.id_notificacion }}</td>
                         <td class="text-center">
                             {% if n.tipo == 'pqrsf' %}
-                                <span class="badge-tipo badge-pqrsf"><i class="fas fa-envelope me-1"></i>PQRSF</span>
+                            <span class="badge-tipo badge-pqrsf"><i class="fas fa-envelope me-1"></i>PQRSF</span>
                             {% elif n.tipo == 'stock' %}
-                                <span class="badge-tipo badge-stock"><i class="fas fa-box me-1"></i>Stock</span>
+                            <span class="badge-tipo badge-stock"><i class="fas fa-box me-1"></i>Stock</span>
                             {% else %}
-                                <span class="badge-tipo badge-sistema"><i class="fas fa-bell me-1"></i>Sistema</span>
+                            <span class="badge-tipo badge-sistema"><i class="fas fa-bell me-1"></i>Sistema</span>
                             {% endif %}
                         </td>
                         <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
                             title="{{ n.mensaje }}">
                             {{ n.mensaje|truncatechars:70 }}
                         </td>
-                        <td class="text-center">
-                            {% if n.leida %}
-                                <span class="badge-leida-si">Sí</span>
-                            {% else %}
-                                <span class="badge-leida-no">No</span>
-                            {% endif %}
-                        </td>
                         <td class="text-center">{{ n.fechaenvio|date:"d/m/Y H:i" }}</td>
                         <td class="text-center">
                             {% if n.tipo == 'pqrsf' and n.pqrsf %}
-                                <a href="{% url 'detalle_pqrsf' n.pqrsf.id_pqrsf %}" class="btn-accion-ver">
-                                    <i class="fas fa-eye"></i> Ver
-                                </a>
+                            <a href="{% url 'detalle_pqrsf' n.pqrsf.id_pqrsf %}" class="btn-accion-ver">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
                             {% else %}
-                                <span class="text-muted" style="font-size:0.78rem;">—</span>
+                            <span class="text-muted" style="font-size:0.78rem;">—</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No tienes notificaciones.</td>
+                        <td colspan="5" class="text-center py-4 text-muted">No tienes notificaciones.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -244,18 +313,24 @@
 
 <script>
     $(document).ready(function () {
-        var table = $('#tablaNotif').DataTable({
-            "pageLength": 10,
-            "order": [[0, "desc"]],
-            "language": {
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                "infoEmpty": "Sin registros",
-                "paginate": { "previous": "Anterior", "next": "Siguiente" }
+    var table = $('#tablaNotif').DataTable({
+        "pageLength": 10,
+        "order": [[0, "desc"]],
+        "language": {
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            "infoEmpty": "Sin registros",
+            "paginate": { "previous": "Anterior", "next": "Siguiente" }
+        },
+        "rowCallback": function(row, data, index) {
+            if ($(row).hasClass('no-leida')) {
+                $('td', row).css('background-color', '#fffde7');
+                $('td', row).css('font-weight', '600');
             }
-        });
-        $('#searchNotif').on('keyup', function () {
-            table.search(this.value).draw();
-        });
+        }
     });
+    $('#searchNotif').on('keyup', function () {
+        table.search(this.value).draw();
+    });
+});
 </script>
 {% endblock %}
