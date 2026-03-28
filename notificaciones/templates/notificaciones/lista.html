@@ -231,12 +231,13 @@
     }
 
     #tablaNotif tbody tr.no-leida td {
-        background-color: #fffde7 !important;
+        background-color: #fff3cd !important;
         font-weight: 600;
+        border-left: 3px solid #ffc107 !important;
     }
 
     #tablaNotif tbody tr.no-leida:hover td {
-        background-color: #fff9c4 !important;
+        background-color: #ffe69c !important;
     }
 </style>
 
@@ -313,24 +314,24 @@
 
 <script>
     $(document).ready(function () {
-    var table = $('#tablaNotif').DataTable({
-        "pageLength": 10,
-        "order": [[0, "desc"]],
-        "language": {
-            "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            "infoEmpty": "Sin registros",
-            "paginate": { "previous": "Anterior", "next": "Siguiente" }
-        },
-        "rowCallback": function(row, data, index) {
-            if ($(row).hasClass('no-leida')) {
-                $('td', row).css('background-color', '#fffde7');
-                $('td', row).css('font-weight', '600');
+        var table = $('#tablaNotif').DataTable({
+            "pageLength": 10,
+            "order": [[0, "desc"]],
+            "language": {
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Sin registros",
+                "paginate": { "previous": "Anterior", "next": "Siguiente" }
+            },
+            "rowCallback": function (row, data, index) {
+                if ($(row).hasClass('no-leida')) {
+                    $('td', row).css('background-color', '#fffde7');
+                    $('td', row).css('font-weight', '600');
+                }
             }
-        }
+        });
+        $('#searchNotif').on('keyup', function () {
+            table.search(this.value).draw();
+        });
     });
-    $('#searchNotif').on('keyup', function () {
-        table.search(this.value).draw();
-    });
-});
 </script>
 {% endblock %}

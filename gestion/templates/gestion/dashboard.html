@@ -102,7 +102,8 @@
         <!-- ✅ Campana + Usuario agrupados a la derecha -->
         <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
 
-            <div style="position:relative; cursor:pointer;" id="campanaWrapper" onclick = "window.location.href='/notificaciones/'">
+            <div style="position:relative; cursor:pointer;" id="campanaWrapper"
+                onclick="window.location.href='/notificaciones/'">
                 <i class="fas fa-bell" style="font-size:1.2rem; color:#FFD700;"></i>
                 <span id="contadorNotif"
                     style="display:none; position:absolute; top:-6px; right:-6px; background:#dc3545; color:white; border-radius:50%; font-size:0.65rem; font-weight:700; width:17px; height:17px; text-align:center; line-height:17px;">0</span>
@@ -136,53 +137,53 @@
 
     {% block full_content %}{% endblock %}
 
-<div class="container">
-    {% block content %}
+    <div class="container">
+        {% block content %}
 
-    <div class="welcome-card">
-        <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo" class="welcome-logo">
-        <h1>¡Bienvenido a SenaFOOD!</h1>
-        <p>Explora la variedad y el sabor optimizando tu tiempo. Estamos aquí para ofrecerte una experiencia
-            gastronómica eficiente y deliciosa.</p>
+        <div class="welcome-card">
+            <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo" class="welcome-logo">
+            <h1>¡Bienvenido a SenaFOOD!</h1>
+            <p>Explora la variedad y el sabor optimizando tu tiempo. Estamos aquí para ofrecerte una experiencia
+                gastronómica eficiente y deliciosa.</p>
 
-        <div class="modules-grid">
-            <div class="module-item">
-                <span class="module-icon">📖</span>
-                <div class="module-text">
-                    <h3>Catálogo</h3>
-                    <p>Ver productos disponibles.</p>
-                    <a href="#">Ir al catálogo →</a>
+            <div class="modules-grid">
+                <div class="module-item">
+                    <span class="module-icon">📖</span>
+                    <div class="module-text">
+                        <h3>Catálogo</h3>
+                        <p>Ver productos disponibles.</p>
+                        <a href="#">Ir al catálogo →</a>
+                    </div>
                 </div>
-            </div>
-            {% if rol_usuario == 'Administrador' %}
-            <div class="module-item">
-                <span class="module-icon">👥</span>
-                <div class="module-text">
-                    <h3>Gestión de usuario</h3>
-                    <p>Administrar perfiles y permisos.</p>
-                    <a href="{% url 'usuarios_lista' %}" class="btn-link">Configurar usuarios →</a>
+                {% if rol_usuario == 'Administrador' %}
+                <div class="module-item">
+                    <span class="module-icon">👥</span>
+                    <div class="module-text">
+                        <h3>Gestión de usuario</h3>
+                        <p>Administrar perfiles y permisos.</p>
+                        <a href="{% url 'usuarios_lista' %}" class="btn-link">Configurar usuarios →</a>
+                    </div>
                 </div>
-            </div>
-            {% endif %}
-            <div class="module-item">
-                <span class="module-icon">🖼️</span>
-                <div class="module-text">
-                    <h3>Gestión de pedidos</h3>
-                    <p>Seguimiento de órdenes en tiempo real.</p>
+                {% endif %}
+                <div class="module-item">
+                    <span class="module-icon">🖼️</span>
+                    <div class="module-text">
+                        <h3>Gestión de pedidos</h3>
+                        <p>Seguimiento de órdenes en tiempo real.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="module-item">
-                <span class="module-icon">🔒</span>
-                <div class="module-text">
-                    <h3>Autenticación</h3>
-                    <p>Configuración de seguridad y acceso.</p>
+                <div class="module-item">
+                    <span class="module-icon">🔒</span>
+                    <div class="module-text">
+                        <h3>Autenticación</h3>
+                        <p>Configuración de seguridad y acceso.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {% endblock %}
-</div>
+        {% endblock %}
+    </div>
 
 
     <script>

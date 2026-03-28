@@ -6,6 +6,11 @@ from django.contrib.auth import logout
 # Nota: Si usas un modelo manual, login_required puede fallar si no está configurado en settings.
 # Usaremos la validación de sesión que ya tienes para ser consistentes.
 
+def bienvenida_view(request):
+    if 'usuario_id' in request.session:
+        return redirect('dashboard')
+    return render(request, 'gestion/bienvenida.html')
+
 def login_view(request):
     error_mensaje = None
     email_ingresado = "" 
