@@ -1,0 +1,84 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'proveedor/css/styles.css' %}">
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">Proveedor #{{ proveedor.id_proveedor }}</div>
+
+        <div class="seccion-titulo"><i class="fas fa-truck"></i> Información del Proveedor</div>
+
+        <div class="detalle-field">
+            <label>Nombre</label>
+            <div class="field-value">{{ proveedor.nombre }}</div>
+        </div>
+
+        <div class="detalle-field">
+            <label>NIT</label>
+            <div class="field-value">{{ proveedor.nit }}</div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Email</label>
+                <div class="field-value">{{ proveedor.email|default:"—" }}</div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Teléfono</label>
+                <div class="field-value">{{ proveedor.telefono|default:"—" }}</div>
+            </div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Dirección</label>
+            <div class="field-value">{{ proveedor.direccion|default:"—" }}</div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Estado</label>
+            <div class="field-value" style="background:transparent; border:none; padding:6px 0;">
+                {% if proveedor.es_activo %}
+                <span class="badge-activo">Activo</span>
+                {% else %}
+                <span class="badge-inactivo">Inactivo</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Registrado el</label>
+            <div class="field-value">{{ proveedor.create_at|date:"d/m/Y h:i a" }}</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Botón crear OC -->
+        {% if proveedor.es_activo %}
+        <a href="#" class="btn-guardar" style="text-decoration:none; text-align:center; display:block;">
+            <i class="fas fa-file-invoice me-2"></i> CREAR ORDEN DE COMPRA
+        </a>
+        {% else %}
+        <div class="info-readonly">
+            <i class="fas fa-exclamation-circle"></i>
+            No se pueden crear órdenes para un proveedor inactivo.
+        </div>
+        {% endif %}
+
+        <div style="display:flex; gap:1rem; margin-top:14px;">
+            <a href="{% url 'editar_proveedor' proveedor.id_proveedor %}" class="btn-volver"
+                style="flex:1; text-align:center;">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'lista_proveedores' %}" class="btn-volver" style="flex:1; text-align:center;">
+                ← Volver a la Lista
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

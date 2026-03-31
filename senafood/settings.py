@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'usuarios',
     'pqrs',
     'notificaciones',
+    'proveedor',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,74 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'proveedor/css/styles.css' %}">
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo_senafood.png' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">Proveedor #{{ proveedor.id_proveedor }}</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background-color:#28a745; color:white; border-radius:8px; padding:10px 16px; font-size:0.85rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="seccion-titulo"><i class="fas fa-truck"></i> Información del Proveedor</div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="detalle-field">
+                <label>Nombre <span class="text-danger">*</span></label>
+                <input type="text" name="nombre" class="field-input" value="{{ proveedor.nombre }}" required>
+            </div>
+
+            <div class="detalle-field">
+                <label>NIT <span class="text-danger">*</span></label>
+                <input type="text" name="nit" class="field-input" value="{{ proveedor.nit }}" required>
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <div class="detalle-field" style="flex:1;">
+                    <label>Email</label>
+                    <input type="email" name="email" class="field-input" value="{{ proveedor.email|default:'' }}" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="detalle-field" style="flex:1;">
+                    <label>Teléfono</label>
+                    <input type="text" name="telefono" class="field-input" value="{{ proveedor.telefono|default:'' }}" placeholder="Número de teléfono">
+                </div>
+            </div>
+
+            <div class="detalle-field">
+                <label>Dirección</label>
+                <input type="text" name="direccion" class="field-input" value="{{ proveedor.direccion|default:'' }}" placeholder="Dirección del proveedor">
+            </div>
+
+            <hr class="divider">
+
+            <div class="seccion-titulo"><i class="fas fa-toggle-on"></i> Estado del Proveedor</div>
+
+            <div class="detalle-field">
+                <label>Estado</label>
+                <select name="es_activo" class="field-input">
+                    <option value="1" {% if proveedor.es_activo %}selected{% endif %}>Activo</option>
+                    <option value="0" {% if not proveedor.es_activo %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-guardar">
+                <i class="fas fa-save me-2"></i> Guardar Cambios
+            </button>
+        </form>
+
+        <a href="{% url 'lista_proveedores' %}" class="btn-volver">← Volver a la Lista</a>
+
+    </div>
+</div>
+{% endblock %}

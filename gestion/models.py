@@ -69,8 +69,7 @@ class Carrito(models.Model):
 class DetallePedido(models.Model):
     id_detalle_pedido = models.BigAutoField(primary_key=True)
     cantidad = models.IntegerField()
-    producto = models.ForeignKey('Producto', on_delete=models.CASCADE, db_column='id_producto')
-    
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE, db_column='id_producto')    
     # Estos campos son útiles para mantener un registro histórico del precio al momento de la compra
     nombre_producto = models.CharField(max_length=255, blank=True, null=True)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
@@ -165,7 +164,7 @@ class Ordencompra(models.Model):
     id_orden = models.BigAutoField(primary_key=True)
     fecha = models.DateField(blank=True, null=True)
     estado = models.CharField(max_length=255, blank=True, null=True)
-    id_proveedor = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='id_proveedor')
+    id_proveedor = models.ForeignKey('proveedor.Proveedor', models.DO_NOTHING, db_column='id_proveedor')
     id_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True)
     producto = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(blank=True, null=True)
@@ -247,21 +246,6 @@ class Promocion(models.Model):
     class Meta:
         managed = True
         db_table = 'promocion'
-
-
-class Proveedor(models.Model):
-    id_proveedor = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    contacto = models.CharField(max_length=255, blank=True, null=True)
-    telefono = models.CharField(max_length=255, blank=True, null=True)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    nit = models.CharField(max_length=255, blank=True, null=True)
-    update_at = models.DateTimeField(blank=True, null=True)
-    create_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'proveedor'
 
 
 class Rol(models.Model):

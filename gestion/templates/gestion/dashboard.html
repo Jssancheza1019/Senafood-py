@@ -93,13 +93,13 @@
             <a href="#"><i class="fas fa-book"></i> Catálogo</a>
             {% if rol_usuario == 'Administrador' %}
             <a href="#"><i class="fas fa-warehouse"></i> Inventario</a>
-            <a href="#"><i class="fas fa-truck"></i> Proveedor</a>
+            <a href="{% url 'lista_proveedores' %}"><i class="fas fa-truck"></i> Proveedor</a>
             <a href="#"><i class="fas fa-file-invoice"></i> O C</a>
             {% endif %}
             <a href="{% url 'lista_pqrsf' %}"><i class="fas fa-envelope-open-text"></i> PQRSF</a>
         </div>
 
-        <!-- ✅ Campana + Usuario agrupados a la derecha -->
+        <!-- Campana + Usuario-->
         <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
 
             <div style="position:relative; cursor:pointer;" id="campanaWrapper"

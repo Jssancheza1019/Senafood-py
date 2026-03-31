@@ -285,7 +285,7 @@ hr {
 }
 
 .login-logo {
-    width: 120px; /* Esto arregla el logo gigante */
+    width: 100px; /* Esto arregla el logo gigante */
     height: auto;
     margin-bottom: 15px;
 }

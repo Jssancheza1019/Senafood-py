@@ -7,4 +7,5 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')), # ruta para usuarios
     path('pqrsf/', include('pqrs.urls')),# ruta de pqrsf
     path('notificaciones/', include('notificaciones.urls')), # ruta notificaciones
+    path('proveedores/', include('proveedor.urls')), # ruta proveedores
 ]
