@@ -216,19 +216,46 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.IntegerField()
-    id_inventario = models.ForeignKey(Inventario, models.DO_NOTHING, db_column='id_inventario')
-    fecha_vencimiento = models.DateField()
+    stock = models.IntegerField(blank=True, null=True)
+    fecha_vencimiento = models.DateField(blank=True, null=True)
     categoria = models.CharField(max_length=255, blank=True, null=True)
     codigo_barras = models.CharField(max_length=255, blank=True, null=True)
     estado = models.CharField(max_length=255)
     create_at = models.DateTimeField(blank=True, null=True)
     update_at = models.DateTimeField(blank=True, null=True)
-    imagen = models.CharField(max_length=255, blank=True, null=True)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    es_activo = models.BooleanField(default=True)
+    motivo_desactivacion = models.CharField(max_length=20, blank=True, null=True)
+    precio_promocion = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    fecha_inicio_promo = models.DateField(blank=True, null=True)
+    fecha_fin_promo = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'producto'
+
+    @property
+    def stock_actual(self):
+        return self.stock or 0
+
+    @property
+    def stock_bajo(self):
+        return self.stock is not None and self.stock <= 10
+
+    @property
+    def en_promocion(self):
+        from datetime import date
+        hoy = date.today()
+        return (
+            self.precio_promocion is not None and
+            self.fecha_inicio_promo is not None and
+            self.fecha_fin_promo is not None and
+            self.fecha_inicio_promo <= hoy <= self.fecha_fin_promo
+        )
+
+    def __str__(self):
+        return self.nombre
 
 
 class Promocion(models.Model):

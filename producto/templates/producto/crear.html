@@ -1,0 +1,138 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'producto/css/styles.css' %}">
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">Nuevo Producto</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div style="background-color:#28a745;color:white;border-radius:8px;padding:10px 16px;font-size:0.85rem;display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </div>
+                {% else %}
+                    <div style="background-color:#dc3545;color:white;border-radius:8px;padding:10px 16px;font-size:0.85rem;display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+                        <i class="fas fa-exclamation-triangle"></i> {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="seccion-titulo"><i class="fas fa-box"></i> Información del Producto</div>
+
+            <div class="detalle-field">
+                <label>Nombre <span class="text-danger">*</span></label>
+                <input type="text" name="nombre" class="field-input" placeholder="Nombre del producto" required>
+            </div>
+
+            <div class="detalle-field">
+                <label>Descripción</label>
+                <input type="text" name="descripcion" class="field-input" placeholder="Descripción breve">
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <div class="detalle-field" style="flex:1;">
+                    <label>Costo Unitario <span class="text-danger">*</span></label>
+                    <input type="number" name="costo_unitario" class="field-input" placeholder="0" step="0.01" required>
+                </div>
+                <div class="detalle-field" style="flex:1;">
+                    <label>Precio de Venta</label>
+                    <input type="number" name="precio_venta" class="field-input" placeholder="0" step="0.01">
+                </div>
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <div class="detalle-field" style="flex:1;">
+                    <label>Stock</label>
+                    <input type="number" name="stock" class="field-input" placeholder="0" min="0">
+                </div>
+                <div class="detalle-field" style="flex:1;">
+                    <label>Código de Barras</label>
+                    <input type="text" name="codigo_barras" class="field-input" placeholder="Código de barras">
+                </div>
+            </div>
+
+            <div class="detalle-field">
+                <label>Fecha de Vencimiento</label>
+                <input type="date" name="fecha_vencimiento" class="field-input">
+            </div>
+
+            <hr class="divider">
+            <div class="seccion-titulo"><i class="fas fa-image"></i> Imagen</div>
+
+            <div class="detalle-field">
+                <label>Imagen del Producto</label>
+                <input type="file" name="imagen" class="field-input" accept="image/*">
+                <small style="color:#888; font-size:0.78rem; margin-top:4px; display:block;">
+                    Formatos: JPG, PNG, WEBP. Se mostrará en el catálogo.
+                </small>
+            </div>
+
+            <hr class="divider">
+            <div class="seccion-titulo"><i class="fas fa-list"></i> Categoría</div>
+
+            <div class="detalle-field">
+                <label>Seleccionar Categoría Existente</label>
+                <select name="categoria" class="field-input">
+                    <option value="">Sin categoría</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <small style="color:#888; font-size:0.78rem; margin-top:4px; display:block;">
+                    ¿No encuentras la categoría? Escríbela abajo:
+                </small>
+                <input type="text" name="categoria_nueva" class="field-input" placeholder="Nueva categoría..." style="margin-top:6px;">
+            </div>
+
+            <hr class="divider">
+            <div class="seccion-titulo"><i class="fas fa-truck"></i> Proveedor</div>
+
+            <div class="detalle-field">
+                <label>Asignar Proveedor</label>
+                <select name="proveedor" class="field-input">
+                    <option value="">Sin proveedor por ahora</option>
+                    {% for prov in proveedores %}
+                        <option value="{{ prov.id_proveedor }}">{{ prov.nombre }} — NIT: {{ prov.nit }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <hr class="divider">
+            <div class="seccion-titulo"><i class="fas fa-tag"></i> Promoción</div>
+
+            <div class="detalle-field">
+                <label>Precio de Promoción</label>
+                <input type="number" name="precio_promocion" class="field-input" placeholder="0" step="0.01">
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <div class="detalle-field" style="flex:1;">
+                    <label>Inicio Promoción</label>
+                    <input type="date" name="fecha_inicio_promo" class="field-input">
+                </div>
+                <div class="detalle-field" style="flex:1;">
+                    <label>Fin Promoción</label>
+                    <input type="date" name="fecha_fin_promo" class="field-input">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-guardar">
+                <i class="fas fa-save me-2"></i> Guardar Producto
+            </button>
+        </form>
+
+        <a href="{% url 'lista_productos' %}" class="btn-volver">← Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}

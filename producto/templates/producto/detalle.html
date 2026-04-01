@@ -1,0 +1,191 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'producto/css/styles.css' %}">
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">Producto #{{ producto.id_producto }}</div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div
+            style="background-color:#28a745;color:white;border-radius:8px;padding:10px 16px;font-size:0.85rem;display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <i class="fas fa-check-circle"></i> {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if producto.imagen %}
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-imagen">
+        {% endif %}
+
+        <div class="seccion-titulo"><i class="fas fa-box"></i> Información del Producto</div>
+
+        <div class="detalle-field">
+            <label>Nombre</label>
+            <div class="field-value">{{ producto.nombre }}</div>
+        </div>
+
+        <div class="detalle-field">
+            <label>Descripción</label>
+            <div class="field-value">{{ producto.descripcion|default:"—" }}</div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Categoría</label>
+                <div class="field-value">{{ producto.categoria|default:"—" }}</div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Código de Barras</label>
+                <div class="field-value">{{ producto.codigo_barras|default:"—" }}</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Estado</label>
+                <div class="field-value" style="background:transparent; border:none; padding:6px 0;">
+                    {% if producto.estado == 'activo' %}<span class="badge-activo">Activo</span>
+                    {% elif producto.estado == 'inactivo' %}<span class="badge-inactivo">Inactivo</span>
+                    {% elif producto.estado == 'agotado' %}<span class="badge-agotado">Agotado</span>
+                    {% elif producto.estado == 'vencido' %}<span class="badge-vencido">Vencido</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Fecha de Vencimiento</label>
+                <div class="field-value">{% if producto.fecha_vencimiento %}{{ producto.fecha_vencimiento|date:"d/m/Y" }}{% else %}—{% endif %}</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+            <label>Registrado el</label>
+                <div class="field-value">{% if producto.create_at %}{{ producto.create_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</div>
+        </div>
+        <div class="detalle-field" style="flex:1;">
+            <label>Última actualización</label>
+            <div class="field-value">{% if producto.update_at %}{{ producto.update_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</div>
+        </div>
+        </div>
+
+        <hr class="divider">
+        <div class="seccion-titulo"><i class="fas fa-dollar-sign"></i> Precios</div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Costo Unitario</label>
+                <div class="field-value">${{ producto.costo_unitario|floatformat:0 }}</div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Precio de Venta</label>
+                <div class="field-value">{% if producto.precio_venta %}${{ producto.precio_venta|floatformat:0 }}{% else
+                    %}—{% endif %}</div>
+            </div>
+        </div>
+
+        {% if producto.precio_venta %}
+        <div class="detalle-field">
+            <label>Margen de Ganancia</label>
+            <div class="field-value" style="color:#28a745; font-weight:600;">
+                {% if margen %}${{ margen|floatformat:0 }}{% else %}—{% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <hr class="divider">
+        <div class="seccion-titulo"><i class="fas fa-cubes"></i> Stock</div>
+
+        <div class="detalle-field">
+            <label>Stock Actual</label>
+            <div class="field-value {% if producto.stock_bajo %}text-danger fw-bold{% endif %}">
+                {{ producto.stock_actual }} unidades
+                {% if producto.stock_bajo %}<span class="badge-stock-bajo ms-2">⚠ Stock Bajo</span>{% endif %}
+            </div>
+        </div>
+
+        <hr class="divider">
+        <div class="seccion-titulo"><i class="fas fa-tag"></i> Promoción</div>
+
+        {% if producto.en_promocion %}
+        <div
+            style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:12px 16px; margin-bottom:12px;">
+            <span class="badge-promo mb-2 d-inline-block"><i class="fas fa-fire me-1"></i> Promoción Activa</span>
+            <div style="display:flex; gap:12px; margin-top:8px;">
+                <div class="detalle-field" style="flex:1;">
+                    <label>Precio Promoción</label>
+                    <div class="field-value">${{ producto.precio_promocion|floatformat:0 }}</div>
+                </div>
+                <div class="detalle-field" style="flex:1;">
+                    <label>Vigencia</label>
+                    <div class="field-value">{{ producto.fecha_inicio_promo|date:"d/m/Y" }} — {{
+                        producto.fecha_fin_promo|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+        </div>
+        {% elif producto.precio_promocion %}
+        <div class="info-readonly">
+            <i class="fas fa-clock"></i>
+            Promoción programada: ${{ producto.precio_promocion|floatformat:0 }} — del {{
+            producto.fecha_inicio_promo|date:"d/m/Y" }} al {{ producto.fecha_fin_promo|date:"d/m/Y" }}
+        </div>
+        {% else %}
+        <div class="info-readonly"><i class="fas fa-info-circle"></i> Sin promoción activa.</div>
+        {% endif %}
+
+        <hr class="divider">
+        <div class="seccion-titulo"><i class="fas fa-truck"></i> Proveedores Asignados</div>
+
+        {% if proveedores_asignados %}
+        {% for pp in proveedores_asignados %}
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 14px; border:1px solid #d4edda; border-radius:8px; margin-bottom:8px; background:#f9fff9;">
+        <span style="font-size:0.9rem; font-weight:600;"><i class="fas fa-truck me-2" style="color:#28a745;"></i>{{ pp.proveedor.nombre }}</span>
+        <span style="font-size:0.85rem; color:#555;">{% if pp.precio_proveedor %}${{ pp.precio_proveedor|floatformat:0 }}{% else %}Sin precio{% endif %}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="info-readonly"><i class="fas fa-info-circle"></i> No hay proveedores asignados.</div>
+        {% endif %}
+
+        {% if proveedores_disponibles %}
+        <form method="POST" action="{% url 'asignar_proveedor' producto.id_producto %}" style="margin-top:12px;">
+            {% csrf_token %}
+            <div style="display:flex; gap:8px;">
+                <select name="proveedor" class="field-input" required>
+                    <option value="">Seleccionar proveedor...</option>
+                    {% for prov in proveedores_disponibles %}
+                    <option value="{{ prov.id_proveedor }}">{{ prov.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="precio_proveedor" class="field-input" placeholder="Precio" step="0.01"
+                    style="max-width:120px;">
+                <button type="submit" class="btn-guardar" style="width:auto; padding:10px 16px; margin-top:0;">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+        <hr class="divider">
+
+        <div style="display:flex; gap:1rem;">
+            <a href="{% url 'editar_producto' producto.id_producto %}" class="btn-guardar"
+                style="text-decoration:none; text-align:center; flex:1;">
+                <i class="fas fa-edit me-2"></i> Editar
+            </a>
+            <a href="{% url 'desactivar_producto' producto.id_producto %}" class="btn-guardar"
+                style="text-decoration:none; text-align:center; flex:1; background-color:#dc3545;">
+                <i class="fas fa-ban me-2"></i> Desactivar
+            </a>
+        </div>
+
+        <a href="{% url 'lista_productos' %}" class="btn-volver">← Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}

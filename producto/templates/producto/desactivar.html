@@ -1,0 +1,66 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'producto/css/styles.css' %}">
+
+<div class="detalle-wrapper">
+    <div class="detalle-card">
+
+        <img src="{% static 'gestion/img/logo_senafood.png' %}" alt="Logo" class="detalle-logo">
+        <div class="detalle-brand">SenaFOOD</div>
+        <div class="detalle-titulo">Desactivar Producto</div>
+
+        <div class="seccion-titulo"><i class="fas fa-box"></i> Producto</div>
+
+        <div class="detalle-field">
+            <label>Nombre</label>
+            <div class="field-value">{{ producto.nombre }}</div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <div class="detalle-field" style="flex:1;">
+                <label>Categoría</label>
+                <div class="field-value">{{ producto.categoria|default:"—" }}</div>
+            </div>
+            <div class="detalle-field" style="flex:1;">
+                <label>Stock Actual</label>
+                <div class="field-value">{{ producto.stock_actual }}</div>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <div class="seccion-titulo"><i class="fas fa-ban"></i> Motivo de Desactivación</div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="detalle-field">
+                <label>Motivo <span class="text-danger">*</span></label>
+                <select name="motivo" class="field-input" required>
+                    <option value="">Seleccione un motivo...</option>
+                    {% for valor, etiqueta in motivos %}
+                        <option value="{{ valor }}">{{ etiqueta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="detalle-field">
+                <label>Nuevo Estado <span class="text-danger">*</span></label>
+                <select name="estado" class="field-input" required>
+                    <option value="">Seleccione el estado...</option>
+                    {% for valor, etiqueta in estados %}
+                        <option value="{{ valor }}">{{ etiqueta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-guardar" style="background-color:#dc3545;">
+                <i class="fas fa-ban me-2"></i> Confirmar Desactivación
+            </button>
+        </form>
+
+        <a href="{% url 'lista_productos' %}" class="btn-volver">← Cancelar y Volver</a>
+    </div>
+</div>
+{% endblock %}

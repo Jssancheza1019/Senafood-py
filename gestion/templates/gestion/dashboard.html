@@ -89,7 +89,7 @@
 
         <div class="nav-links">
             <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="#"><i class="fas fa-box"></i> Productos</a>
+            <a href="{% url 'lista_productos' %}"><i class="fas fa-box"></i> Productos</a>
             <a href="#"><i class="fas fa-book"></i> Catálogo</a>
             {% if rol_usuario == 'Administrador' %}
             <a href="#"><i class="fas fa-warehouse"></i> Inventario</a>
