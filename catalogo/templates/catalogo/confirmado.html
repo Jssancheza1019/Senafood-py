@@ -1,0 +1,31 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+<div style="text-align:center; padding:80px 20px;">
+    <div style="width:80px; height:80px; background:#e9f7ef; border-radius:50%;
+                display:flex; align-items:center; justify-content:center;
+                margin:0 auto 24px auto; font-size:2.5rem;">
+        ✅
+    </div>
+    <h2 style="color:#28a745; font-weight:700; margin-bottom:12px;">
+        ¡Pedido confirmado!
+    </h2>
+    <p style="color:#6c757d; font-size:1rem; max-width:400px; margin:0 auto 32px auto;">
+        Tu pedido fue recibido y está pendiente de pago.
+        Acércate al cajero para completar tu compra.
+    </p>
+    <a href="{% url 'catalogo' %}"
+       style="background:#28a745; color:white; padding:12px 32px;
+              border-radius:20px; text-decoration:none; font-weight:600;
+              display:inline-flex; align-items:center; gap:8px;">
+        <i class="fas fa-book"></i> Seguir comprando
+    </a>
+</div>
+</div>
+{% endblock %}

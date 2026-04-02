@@ -1,0 +1,171 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+<div class="container-fluid mt-4 px-4">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+        <h4 class="page-title mb-0"><i class="fas fa-store me-2"></i>Vista Vendedor</h4>
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:#6c757d;">
+            <span id="indicador" style="width:8px; height:8px; border-radius:50%; background:#28a745; display:inline-block;"></span>
+            Actualizando automáticamente
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+
+        <!-- CAJERO -->
+        <div class="carrito-card">
+            <h5 style="color:#28a745; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-cash-register"></i>
+                Pendientes de pago
+                <span id="badge-caja" style="background:#dc3545; color:white; border-radius:20px; padding:2px 10px; font-size:0.75rem; margin-left:4px;">0</span>
+            </h5>
+            <div id="lista-caja">
+                <div style="text-align:center; padding:32px; color:#6c757d;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENTREGADOR -->
+        <div class="carrito-card">
+            <h5 style="color:#17a2b8; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-box-open"></i>
+                Pendientes de entrega
+                <span id="badge-entrega" style="background:#17a2b8; color:white; border-radius:20px; padding:2px 10px; font-size:0.75rem; margin-left:4px;">0</span>
+            </h5>
+            <div id="lista-entrega">
+                <div style="text-align:center; padding:32px; color:#6c757d;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<script>
+function renderPedidoCaja(p) {
+    const detalles = p.detalles.map(d =>
+        `<div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#555; padding:3px 0;">
+            <span>${d.nombre} x${d.cantidad}</span>
+            <span>$${d.subtotal.toLocaleString()}</span>
+        </div>`
+    ).join('');
+
+    return `
+    <div style="border:1px solid #d4edda; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div>
+                <span style="font-weight:700; color:#2e3b33;">Pedido #${p.id}</span>
+                <span style="color:#6c757d; font-size:0.82rem; margin-left:8px;">${p.cliente}</span>
+            </div>
+            <span style="color:#28a745; font-weight:700; font-size:1.1rem;">$${p.total.toLocaleString()}</span>
+        </div>
+        ${detalles}
+        <a href="/catalogo/pedidos/cobrar/${p.id}/"
+        style="background:#28a745; color:white; border:none; padding:8px 20px;
+                border-radius:20px; font-size:0.85rem; font-weight:600; cursor:pointer;
+                width:100%; display:flex; align-items:center; justify-content:center;
+                gap:6px; text-decoration:none; margin-top:12px;">
+            <i class="fas fa-money-bill-wave"></i> Cobrar pedido
+        </a>
+    </div>`;
+}
+
+function renderPedidoEntrega(p) {
+    const detalles = p.detalles.map(d =>
+        `<div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#555; padding:3px 0;">
+            <span>${d.nombre} x${d.cantidad}</span>
+            <span>$${d.subtotal.toLocaleString()}</span>
+        </div>`
+    ).join('');
+
+    return `
+    <div style="border:1px solid #bee5eb; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div>
+                <span style="font-weight:700; color:#2e3b33;">Pedido #${p.id}</span>
+                <span style="color:#6c757d; font-size:0.82rem; margin-left:8px;">${p.cliente}</span>
+            </div>
+            <span style="color:#17a2b8; font-weight:700; font-size:1.1rem;">$${p.total.toLocaleString()}</span>
+        </div>
+        ${detalles}
+        <form method="POST" action="/catalogo/pedidos/entregar/${p.id}/" style="margin-top:12px;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
+            <button type="submit" style="background:#17a2b8; color:white; border:none; padding:8px 20px;
+                    border-radius:20px; font-size:0.85rem; font-weight:600; cursor:pointer;
+                    width:100%; display:flex; align-items:center; justify-content:center; gap:6px;">
+                <i class="fas fa-check"></i> Confirmar entrega
+            </button>
+        </form>
+    </div>`;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function actualizarPedidos() {
+    const indicador = document.getElementById('indicador');
+    indicador.style.background = '#ffc107';
+
+    fetch('/catalogo/pedidos/json/')
+        .then(res => res.json())
+        .then(data => {
+            // Caja
+            const listaCaja = document.getElementById('lista-caja');
+            document.getElementById('badge-caja').textContent = data.pedidos_caja.length;
+            if (data.pedidos_caja.length === 0) {
+                listaCaja.innerHTML = `
+                    <div style="text-align:center; padding:32px; color:#6c757d;">
+                        <i class="fas fa-check-circle" style="font-size:2rem; color:#a8d5b5; display:block; margin-bottom:8px;"></i>
+                        No hay pedidos pendientes de pago
+                    </div>`;
+            } else {
+                listaCaja.innerHTML = data.pedidos_caja.map(renderPedidoCaja).join('');
+            }
+
+            // Entrega
+            const listaEntrega = document.getElementById('lista-entrega');
+            document.getElementById('badge-entrega').textContent = data.pedidos_entrega.length;
+            if (data.pedidos_entrega.length === 0) {
+                listaEntrega.innerHTML = `
+                    <div style="text-align:center; padding:32px; color:#6c757d;">
+                        <i class="fas fa-box-open" style="font-size:2rem; color:#bee5eb; display:block; margin-bottom:8px;"></i>
+                        No hay pedidos pendientes de entrega
+                    </div>`;
+            } else {
+                listaEntrega.innerHTML = data.pedidos_entrega.map(renderPedidoEntrega).join('');
+            }
+
+            indicador.style.background = '#28a745';
+        })
+        .catch(err => {
+            console.warn('Error actualizando pedidos:', err);
+            indicador.style.background = '#dc3545';
+        });
+}
+
+actualizarPedidos();
+setInterval(actualizarPedidos, 5000);
+</script>
+{% endblock %}

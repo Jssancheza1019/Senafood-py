@@ -50,20 +50,31 @@ class Calificacion(models.Model):
 
 
 class Carrito(models.Model):
-    id_carrito = models.AutoField(primary_key=True)
-    # CORREGIDO: De IntegerField a ForeignKey
-    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='id_usuario')
-    total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    estado = models.CharField(max_length=50, blank=True, null=True)
-    fecha = models.DateTimeField(auto_now_add=True, blank=True, null=True) # auto_now_add es mejor para fechas de creación
-    metodopago = models.CharField(db_column='metodoPago', max_length=50, blank=True, null=True)
-    numerofactura = models.CharField(db_column='numeroFactura', max_length=50, blank=True, null=True)
-    create_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    update_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    ESTADOS = [
+        ('abierto',           'Abierto'),
+        ('pendiente_pago',    'Pendiente de pago'),
+        ('pagado',            'Pagado'),
+        ('pendiente_entrega', 'Pendiente de entrega'),
+        ('entregado',         'Entregado'),
+    ]
+
+    id_carrito     = models.AutoField(primary_key=True)
+    usuario        = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='id_usuario')
+    total          = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    estado         = models.CharField(max_length=50, blank=True, null=True, choices=ESTADOS)
+    fecha          = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    metodopago     = models.CharField(db_column='metodoPago', max_length=50, blank=True, null=True)
+    numerofactura  = models.CharField(db_column='numeroFactura', max_length=50, blank=True, null=True)
+    create_at      = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    update_at      = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
-        managed = True
+        managed  = True
         db_table = 'carrito'
+
+    def __str__(self):
+        return f'Pedido #{self.id_carrito} - {self.usuario.nombre} - {self.estado}'
 
 
 class DetallePedido(models.Model):
