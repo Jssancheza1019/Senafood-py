@@ -33,8 +33,8 @@ def lista_productos_view(request):
         return redirect('login')
 
     filtro_categoria = request.GET.get('categoria', '')
-    filtro_estado = request.GET.get('estado', '')
-    filtro_stock = request.GET.get('stock', '')
+    filtro_estado    = request.GET.get('estado', '')
+    filtro_stock     = request.GET.get('stock', '')
 
     productos = Producto.objects.all().order_by('nombre')
 
@@ -42,18 +42,35 @@ def lista_productos_view(request):
         productos = productos.filter(categoria=filtro_categoria)
     if filtro_estado:
         productos = productos.filter(estado=filtro_estado)
+
+    # Convertir a lista solo al final
+    productos = list(productos)
+
     if filtro_stock == 'bajo':
         productos = [p for p in productos if p.stock_bajo]
 
-    categorias = Producto.objects.values_list('categoria', flat=True).distinct().exclude(categoria=None)
+    categorias = Producto.objects.values_list(
+        'categoria', flat=True
+    ).distinct().exclude(categoria=None)
+
+    # Conteos
+    base = Producto.objects.all()
+    total_activos   = base.filter(estado='activo').count()
+    total_inactivos = base.filter(estado='inactivo').count()
+    total_agotados  = base.filter(estado='agotado').count()
+    total_vencidos  = base.filter(estado='vencido').count()
 
     return render(request, 'producto/lista.html', {
-        'productos': productos,
-        'categorias': categorias,
+        'productos':        productos,
+        'categorias':       categorias,
         'filtro_categoria': filtro_categoria,
-        'filtro_estado': filtro_estado,
-        'filtro_stock': filtro_stock,
-        'estados': [('activo', 'Activo'), ('inactivo', 'Inactivo'), ('agotado', 'Agotado'), ('vencido', 'Vencido')],
+        'filtro_estado':    filtro_estado,
+        'filtro_stock':     filtro_stock,
+        'estados':          [('activo', 'Activo'), ('inactivo', 'Inactivo'), ('agotado', 'Agotado'), ('vencido', 'Vencido')],
+        'total_activos':    total_activos,
+        'total_inactivos':  total_inactivos,
+        'total_agotados':   total_agotados,
+        'total_vencidos':   total_vencidos,
     })
 
 

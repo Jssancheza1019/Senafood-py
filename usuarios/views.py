@@ -15,11 +15,22 @@ def usuarios_lista_view(request):
     if 'usuario_nombre' not in request.session:
         return redirect('login')
     
-    # OPCIÓN A: Traer todos sin filtros (para ver Activos e Inactivos)
-    # Agregamos .order_by para que los activos salgan primero
     usuarios = Usuario.objects.all().order_by('-es_activo', 'nombre')
-    
-    return render(request, 'usuarios/lista.html', {'usuarios': usuarios})
+    # Conteos   
+    total_activos    = Usuario.objects.filter(es_activo=True).count()
+    total_inactivos  = Usuario.objects.filter(es_activo=False).count()
+    total_admins     = Usuario.objects.filter(rol__nombre_rol='Administrador').count()
+    total_vendedores = Usuario.objects.filter(rol__nombre_rol='Vendedor').count()
+    total_clientes   = Usuario.objects.filter(rol__nombre_rol='Cliente').count()
+
+    return render(request, 'usuarios/lista.html', {
+        'usuarios':         usuarios,
+        'total_activos':    total_activos,
+        'total_inactivos':  total_inactivos,
+        'total_admins':     total_admins,
+        'total_vendedores': total_vendedores,
+        'total_clientes':   total_clientes,
+    })
 
 # FUNCIÓN ELIMINAR
 def eliminar_usuario(request, id_usuario):

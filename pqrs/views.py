@@ -47,16 +47,30 @@ def lista_pqrsf_view(request):
     if filtro_leida != '':
         pqrsf_list = pqrsf_list.filter(leida=(filtro_leida == '1'))
 
+    #conteos para cards
+    base = PQRSF.objects.all() if rol == 'Administrador' else PQRSF.objects.filter(usuario=usuario)
+    total_leidas     = base.filter(leida=True).count()
+    total_no_leidas  = base.filter(leida=False).count()
+    total_pendiente  = base.filter(estado='Pendiente').count()
+    total_resuelta   = base.filter(estado='Resuelta').count()
+    total_en_gestion = base.filter(estado='En gestión').count()
+
     return render(request, 'pqrs/lista.html', {
-        'pqrsf_list': pqrsf_list,
-        'rol': rol,
-        'nombre_usuario': usuario.nombre,
-        'filtro_tipo': filtro_tipo,
-        'filtro_estado': filtro_estado,
-        'filtro_leida': filtro_leida,
-        'tipos': PQRSF.TIPO_CHOICES,
-        'estados': PQRSF.ESTADO_CHOICES,
+        'pqrsf_list':      pqrsf_list,
+        'rol':             rol,
+        'nombre_usuario':  usuario.nombre,
+        'filtro_tipo':     filtro_tipo,
+        'filtro_estado':   filtro_estado,
+        'filtro_leida':    filtro_leida,
+        'tipos':           PQRSF.TIPO_CHOICES,
+        'estados':         PQRSF.ESTADO_CHOICES,
+        'total_leidas':    total_leidas,
+        'total_no_leidas': total_no_leidas,
+        'total_pendiente': total_pendiente,
+        'total_resuelta':  total_resuelta,
+        'total_en_gestion':total_en_gestion,
     })
+
 
 
 def detalle_pqrsf_view(request, id):

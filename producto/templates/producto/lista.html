@@ -11,26 +11,77 @@
     <div class="card-sena">
 
         {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == 'success' %}
-                    <div class="alerta-exito"><i class="fas fa-check-circle"></i> {{ message }}</div>
-                {% else %}
-                    <div class="alerta-error"><i class="fas fa-exclamation-triangle"></i> {{ message }}</div>
-                {% endif %}
-            {% endfor %}
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alerta-exito"><i class="fas fa-check-circle"></i> {{ message }}</div>
+        {% else %}
+        <div class="alerta-error"><i class="fas fa-exclamation-triangle"></i> {{ message }}</div>
         {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <!-- Cards resumen -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1.5rem;">
+            <div
+                style="flex:1; min-width:160px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #28a745; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div
+                    style="width:48px;height:48px;border-radius:50%;background:#e9f7ef;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                    <i class="fas fa-check-circle" style="color:#28a745;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Activos</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#28a745;line-height:1;">{{ total_activos }}</div>
+                </div>
+            </div>
+            <div
+                style="flex:1; min-width:160px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #6c757d; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div
+                    style="width:48px;height:48px;border-radius:50%;background:#f4f4f4;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                    <i class="fas fa-ban" style="color:#6c757d;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Inactivos</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#6c757d;line-height:1;">{{ total_inactivos }}
+                    </div>
+                </div>
+            </div>
+            <div
+                style="flex:1; min-width:160px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #dc3545; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div
+                    style="width:48px;height:48px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                    <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Agotados</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#dc3545;line-height:1;">{{ total_agotados }}
+                    </div>
+                </div>
+            </div>
+            <div
+                style="flex:1; min-width:160px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #343a40; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div
+                    style="width:48px;height:48px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                    <i class="fas fa-calendar-times" style="color:#343a40;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Vencidos</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#343a40;line-height:1;">{{ total_vencidos }}
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="toolbar">
             <div class="toolbar-left">
-                <div class="dropdown">
-                    <button class="btn-nuevo dropdown-toggle" type="button" id="btnInformes" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-file-alt"></i> Informes ▼
-                    </button>
-                    <ul class="dropdown-menu shadow-sm" aria-labelledby="btnInformes">
-                        <li><a class="dropdown-item" href="{% url 'exportar_excel_productos' %}?categoria={{ filtro_categoria }}&estado={{ filtro_estado }}&stock={{ filtro_stock }}"><i class="fas fa-file-excel text-success me-2"></i> Excel</a></li>
-                        <li><a class="dropdown-item" href="{% url 'exportar_pdf_productos' %}?categoria={{ filtro_categoria }}&estado={{ filtro_estado }}&stock={{ filtro_stock }}"><i class="fas fa-file-pdf text-danger me-2"></i> PDF</a></li>
-                    </ul>
-                </div>
+                <div class="dropdown" style="position:relative; display:inline-block;">
+    <button class="btn-nuevo" type="button" onclick="toggleInformes(this)">
+        <i class="fas fa-file-alt"></i> Informes ▼
+    </button>
+    <ul id="menuInformes" style="display:none; position:absolute; top:100%; left:0; background:white; border:1px solid #dee2e6; border-radius:8px; padding:4px 0; min-width:160px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:9999; list-style:none; margin:4px 0 0 0;">
+        <li><a class="dropdown-item" href="{% url 'exportar_excel_productos' %}?categoria={{ filtro_categoria }}&estado={{ filtro_estado }}&stock={{ filtro_stock }}"><i class="fas fa-file-excel text-success me-2"></i> Excel</a></li>
+        <li><a class="dropdown-item" href="{% url 'exportar_pdf_productos' %}?categoria={{ filtro_categoria }}&estado={{ filtro_estado }}&stock={{ filtro_stock }}"><i class="fas fa-file-pdf text-danger me-2"></i> PDF</a></li>
+    </ul>
+</div>
             </div>
 
             <span class="title-list">Lista de Productos</span>
@@ -51,13 +102,13 @@
                 <select name="categoria" class="filtro-select">
                     <option value="">Todas las categorías</option>
                     {% for cat in categorias %}
-                        <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                    <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
                 </select>
                 <select name="estado" class="filtro-select">
                     <option value="">Todos los estados</option>
                     {% for valor, etiqueta in estados %}
-                        <option value="{{ valor }}" {% if filtro_estado == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                    <option value="{{ valor }}" {% if filtro_estado == valor %}selected{% endif %}>{{ etiqueta }}</option>
                     {% endfor %}
                 </select>
                 <select name="stock" class="filtro-select">
@@ -70,56 +121,57 @@
         </form>
 
         <div class="table-responsive w-100">
-            <table id="tablaProductos" class="table table-sm table-hover table-bordered">
-                <thead class="table-sena-header">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Costo</th>
-                        <th>Precio Venta</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Promoción</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in productos %}
-                    <tr>
-                        <td class="text-center fw-bold">{{ p.id_producto }}</td>
-                        <td>{{ p.nombre }}</td>
-                        <td class="text-center">{{ p.categoria|default:"—" }}</td>
-                        <td class="text-center">${{ p.costo_unitario|floatformat:0 }}</td>
-                        <td class="text-center">{% if p.precio_venta %}${{ p.precio_venta|floatformat:0 }}{% else %}—{% endif %}</td>
-                        <td class="text-center">{% if p.stock_bajo %}<span class="badge-stock-bajo">{{ p.stock_actual }}</span>{% else %}{{ p.stock_actual }}{% endif %}</td>
-                        <td class="text-center">
-                            {% if p.estado == 'activo' %}<span class="badge-activo">Activo</span>
-                            {% elif p.estado == 'inactivo' %}<span class="badge-inactivo">Inactivo</span>
-                            {% elif p.estado == 'agotado' %}<span class="badge-agotado">Agotado</span>
-                            {% elif p.estado == 'vencido' %}<span class="badge-vencido">Vencido</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center">{% if p.en_promocion %}<span class="badge-promo"><i class="fas fa-tag me-1"></i>Promo</span>{% else %}—{% endif %}</td>
-                        <td class="text-center" style="white-space:nowrap;">
-                            <a href="{% url 'detalle_producto' p.id_producto %}" class="btn-accion-ver"><i class="fas fa-eye"></i> Ver</a>
-                            <a href="{% url 'editar_producto' p.id_producto %}" class="btn-accion-editar"><i class="fas fa-edit"></i> Editar</a>
-                            {% if p.es_activo %}
-                            <a href="{% url 'desactivar_producto' p.id_producto %}" class="btn-accion-desactivar"><i class="fas fa-ban"></i> Desactivar</a>
-                            {% else %}
-                            <a href="{% url 'desactivar_producto' p.id_producto %}" class="btn-accion-ver" style="background-color:#28a745;"><i class="fas fa-check-circle"></i> Activar</a>
-                            {% endif %}
-                            <a href="{% url 'eliminar_producto' p.id_producto %}" class="btn-accion-eliminar" onclick="return confirm('¿Eliminar {{ p.nombre }}? Esta acción no se puede deshacer.');"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9" class="text-center py-4 text-muted">No se encontraron productos.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <table id="tablaProductos" class="table table-sm table-hover table-bordered">
+        <thead class="table-sena-header">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Costo</th>
+                <th>Precio Venta</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Promoción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr>
+                <td class="text-center fw-bold">{{ p.id_producto }}</td>
+                <td>{{ p.nombre }}</td>
+                <td class="text-center">{{ p.categoria|default:"—" }}</td>
+                <td class="text-center">${{ p.costo_unitario|floatformat:0 }}</td>
+                <td class="text-center">{% if p.precio_venta %}${{ p.precio_venta|floatformat:0 }}{% else %}—{% endif %}</td>
+                <td class="text-center">{% if p.stock_bajo %}<span class="badge-stock-bajo">{{ p.stock_actual }}</span>{% else %}{{ p.stock_actual }}{% endif %}</td>
+                <td class="text-center">
+                    {% if p.estado == 'activo' %}<span class="badge-activo">Activo</span>
+                    {% elif p.estado == 'inactivo' %}<span class="badge-inactivo">Inactivo</span>
+                    {% elif p.estado == 'agotado' %}<span class="badge-agotado">Agotado</span>
+                    {% elif p.estado == 'vencido' %}<span class="badge-vencido">Vencido</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">{% if p.en_promocion %}<span class="badge-promo"><i class="fas fa-tag me-1"></i>Promo</span>{% else %}—{% endif %}</td>
+                <td class="text-center" style="white-space:nowrap;">
+                    <a href="{% url 'detalle_producto' p.id_producto %}" class="btn-accion-ver"><i class="fas fa-eye"></i> Ver</a>
+                    <a href="{% url 'editar_producto' p.id_producto %}" class="btn-accion-editar"><i class="fas fa-edit"></i> Editar</a>
+                    {% if p.es_activo %}
+                    <a href="{% url 'desactivar_producto' p.id_producto %}" class="btn-accion-desactivar"><i class="fas fa-ban"></i> Desactivar</a>
+                    {% else %}
+                    <a href="{% url 'desactivar_producto' p.id_producto %}" class="btn-accion-ver" style="background-color:#28a745;"><i class="fas fa-check-circle"></i> Activar</a>
+                    {% endif %}
+                    <a href="{% url 'eliminar_producto' p.id_producto %}" class="btn-accion-eliminar" onclick="return confirm('¿Eliminar {{ p.nombre }}? Esta acción no se puede deshacer.');"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not productos %}
+            <tr>
+                <td colspan="9" class="text-center py-4 text-muted">No se encontraron productos.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
     </div>
 </div>
 
@@ -143,5 +195,18 @@
             table.search(this.value).draw();
         });
     });
+
+    function toggleInformes(btn) {
+    var menu = document.getElementById('menuInformes');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        var menu = document.getElementById('menuInformes');
+        if (menu) menu.style.display = 'none';
+    }
+});
+    
 </script>
 {% endblock %}

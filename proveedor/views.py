@@ -39,9 +39,15 @@ def lista_proveedores_view(request):
     elif filtro_estado == '0':
         proveedores = proveedores.filter(es_activo=False)
 
+    # Conteos cards
+    total_activos   = Proveedor.objects.filter(es_activo=True).count()
+    total_inactivos = Proveedor.objects.filter(es_activo=False).count()
+
     return render(request, 'proveedor/lista.html', {
-        'proveedores': proveedores,
-        'filtro_estado': filtro_estado,
+        'proveedores':      proveedores,
+        'filtro_estado':    filtro_estado,
+        'total_activos':    total_activos,
+        'total_inactivos':  total_inactivos,
     })
 
 

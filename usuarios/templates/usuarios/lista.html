@@ -322,24 +322,65 @@
         {% endfor %}
         {% endif %}
 
+        <!-- Cards resumen -->
+        <!-- Cards resumen -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1.5rem;">
+            <div style="flex:1; min-width:140px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #28a745; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:#e9f7ef;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                    <i class="fas fa-user-check" style="color:#28a745;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Activos</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#28a745;line-height:1;">{{ total_activos }}</div>
+                </div>
+            </div>
+            <div style="flex:1; min-width:140px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #6c757d; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:#f4f4f4;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                <i class="fas fa-user-slash" style="color:#6c757d;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Inactivos</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#6c757d;line-height:1;">{{ total_inactivos }}</div>
+                </div>
+            </div>
+            <div style="flex:1; min-width:140px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #17a2b8; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:#e3f8fb;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                    <i class="fas fa-user-shield" style="color:#17a2b8;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Administradores</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#17a2b8;line-height:1;">{{ total_admins }}</div>
+                </div>
+            </div>
+            <div style="flex:1; min-width:140px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #fd7e14; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                    <i class="fas fa-user-tag" style="color:#fd7e14;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Vendedores</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#fd7e14;line-height:1;">{{ total_vendedores }}</div>
+                </div>
+            </div>
+            <div style="flex:1; min-width:140px; display:flex; align-items:center; gap:14px; background:white; border-radius:10px; border:1px solid #d4edda; border-left:5px solid #6f42c1; box-shadow:0 2px 8px rgba(40,167,69,0.07); padding:14px 18px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:#f0ebff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                    <i class="fas fa-user" style="color:#6f42c1;"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#6c757d;font-weight:500;">Clientes</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#6f42c1;line-height:1;">{{ total_clientes }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="toolbar">
             <div class="toolbar-left">
-                <div class="dropdown">
-                    <button class="btn-informes dropdown-toggle" type="button" id="btnInformes"
-                        data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropdown" style="position:relative; display:inline-block;">
+                    <button class="btn-informes" type="button" onclick="toggleInformes(this)">
                         <i class="fas fa-file-alt"></i> Informes ▼
                     </button>
-                    <ul class="dropdown-menu shadow-sm" aria-labelledby="btnInformes">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'exportar_excel' %}">
-                                <i class="fas fa-file-excel text-success me-2"></i> Excel
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'exportar_pdf' %}">
-                                <i class="fas fa-file-pdf text-danger me-2"></i> PDF
-                            </a>
-                        </li>
+                    <ul id="menuInformes" style="display:none; position:absolute; top:100%; left:0; background:white; border:1px solid #dee2e6; border-radius:8px; padding:4px 0; min-width:160px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:9999; list-style:none; margin:4px 0 0 0;">
+                        <li><a class="dropdown-item" href="{% url 'exportar_excel' %}"><i class="fas fa-file-excel text-success me-2"></i> Excel</a></li>
+                        <li><a class="dropdown-item" href="{% url 'exportar_pdf' %}"><i class="fas fa-file-pdf text-danger me-2"></i> PDF</a></li>
                     </ul>
                 </div>
             </div>
@@ -428,5 +469,16 @@
             table.search(this.value).draw();
         });
     });
+    function toggleInformes(btn) {
+    var menu = document.getElementById('menuInformes');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        var menu = document.getElementById('menuInformes');
+        if (menu) menu.style.display = 'none';
+    }
+});
 </script>
 {% endblock %}
