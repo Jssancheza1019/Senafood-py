@@ -89,14 +89,19 @@ class DetallePedido(models.Model):
 
 
 class Detallecarrito(models.Model):
-    id_detalle = models.AutoField(primary_key=True)
-    id_carrito = models.ForeignKey(Carrito, models.DO_NOTHING, db_column='id_carrito')
-    id_producto = models.ForeignKey('Producto', models.DO_NOTHING, db_column='id_producto')
-    cantidad = models.IntegerField()
+    id_detalle      = models.AutoField(primary_key=True)
+    id_carrito      = models.ForeignKey(Carrito, models.DO_NOTHING, db_column='id_carrito')
+    id_producto     = models.ForeignKey('Producto', models.DO_NOTHING, db_column='id_producto')
+    cantidad        = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
-        managed = True
+        managed  = True
         db_table = 'detallecarrito'
+
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario
 
 
 

@@ -1,17 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import PQRSF
-from gestion.models import Usuario
-import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment
 from django.http import HttpResponse
-from reportlab.lib.pagesizes import landscape, A4
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
 from django.utils import timezone
 from django.utils.timezone import localtime
+from django.conf import settings
+
+from .models import PQRSF
+from gestion.models import Usuario
 from notificaciones.models import Notificacion
+
+import os
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 
 
 def get_usuario_session(request): #Helper para obtener usuario y su rol desde la sesión.
@@ -230,64 +236,171 @@ def exportar_pdf_pqrsf(request):
     usuario_session, rol = get_usuario_session(request)
     if not usuario_session:
         return redirect('login')
+    
+    # filtros de la lista ──
+    filtro_tipo   = request.GET.get('tipo', '')
+    filtro_estado = request.GET.get('estado', '')
+    filtro_leida  = request.GET.get('leida', '')
 
     if rol == 'Administrador':
         pqrsf_list = PQRSF.objects.select_related('usuario').all().order_by('-create_at')
     else:
         pqrsf_list = PQRSF.objects.select_related('usuario').filter(usuario=usuario_session).order_by('-create_at')
 
+    if filtro_tipo:
+        pqrsf_list = pqrsf_list.filter(tipo=filtro_tipo)
+    if filtro_estado:
+        pqrsf_list = pqrsf_list.filter(estado=filtro_estado)
+    if filtro_leida != '':
+        pqrsf_list = pqrsf_list.filter(leida=(filtro_leida == '1'))
+    
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Reporte_PQRSF.pdf"'
 
-    doc = SimpleDocTemplate(response, pagesize=landscape(A4), leftMargin=20, rightMargin=20)
+    doc = SimpleDocTemplate(
+        response,
+        pagesize=landscape(A4),
+        leftMargin=30, rightMargin=30,
+        topMargin=30, bottomMargin=30
+    )
+
     styles = getSampleStyleSheet()
     elements = []
 
-    # TÍTULO Y FECHA (Aquí estaba el error del ValueError)
-    elements.append(Paragraph('Reporte PQRSF - SenaFOOD', styles['Title']))
-    
-    # Usamos timezone.now() para que no sea una "naive datetime"
-    fecha_generacion = localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
-    elements.append(Paragraph(f'Generado: {fecha_generacion}', styles['Normal']))
+    # ── Estilos ──
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Title'],
+        fontSize=18,
+        textColor=colors.HexColor('#28A745'),
+        spaceAfter=4,
+        fontName='Helvetica-Bold',
+        alignment=1,
+    )
+    subtitle_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.HexColor('#666666'),
+        alignment=1,
+        spaceAfter=2,
+    )
+    stat_style = ParagraphStyle(
+        'Stat',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.HexColor('#333333'),
+        alignment=1,
+    )
+
+    # ── Header con logo ──
+    logo_path = os.path.join(settings.BASE_DIR, 'gestion', 'static', 'gestion', 'img', 'logo.png')
+    if os.path.exists(logo_path):
+        from reportlab.platypus import Image as RLImage
+        logo  = RLImage(logo_path, width=80, height=80)
+        logo2 = RLImage(logo_path, width=80, height=80)
+        header_data = [[logo, Paragraph('Reporte de PQRSF', title_style), logo2]]
+        header_table = Table(header_data, colWidths=[90, 580, 90])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+        ]))
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph('Reporte de PQRSF', title_style))
+
+    elements.append(Paragraph('SenaFOOD - Sistema de Gestión', subtitle_style))
+    elements.append(Paragraph(
+        f'Generado el {localtime(timezone.now()).strftime("%d/%m/%Y a las %H:%M")} '
+        f'por {request.session.get("usuario_nombre", "Administrador")}',
+        subtitle_style
+    ))
+    elements.append(Spacer(1, 6))
+
+    # ── Línea verde ──
+    from reportlab.platypus import HRFlowable
+    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#28A745')))
+    elements.append(Spacer(1, 8))
+
+    # ── Estadísticas ──
+    base = PQRSF.objects.all() if rol == 'Administrador' else PQRSF.objects.filter(usuario=usuario_session)
+    total        = base.count()
+    pendientes   = base.filter(estado='Pendiente').count()
+    en_gestion   = base.filter(estado='En gestión').count()
+    resueltas    = base.filter(estado='Resuelta').count()
+    no_leidas    = base.filter(leida=False).count()
+
+    stats_data = [[
+        Paragraph(f'<b>Total:</b> {total}',             stat_style),
+        Paragraph(f'<b>Pendientes:</b> {pendientes}',   stat_style),
+        Paragraph(f'<b>En gestión:</b> {en_gestion}',   stat_style),
+        Paragraph(f'<b>Resueltas:</b> {resueltas}',     stat_style),
+        Paragraph(f'<b>No leídas:</b> {no_leidas}',     stat_style),
+    ]]
+    stats_table = Table(stats_data, colWidths=[148, 148, 148, 148, 148])
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND',    (0,0), (-1,-1), colors.HexColor('#f0fff4')),
+        ('GRID',          (0,0), (-1,-1), 0.5, colors.HexColor('#a8d5b5')),
+        ('TOPPADDING',    (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
+    ]))
+    elements.append(stats_table)
     elements.append(Spacer(1, 12))
 
-    # Encabezados de la tabla
-    data = [['ID', 'Tipo', 'Estado', 'Usuario', 'Leída', 'Fecha']]
-    
+    # ── Tabla de datos ──
+    data = [['ID', 'Tipo', 'Estado', 'Usuario', 'Descripción', 'Leída', 'Fecha']]
+
     for p in pqrsf_list:
-        # PROTECCIÓN CONTRA USUARIOS BORRADOS (Error DoesNotExist)
         try:
-            if p.usuario:
-                nombre_u = f"{p.usuario.nombre} {p.usuario.apellido}"
-            else:
-                nombre_u = "Sin usuario asignado"
+            nombre_u = f"{p.usuario.nombre} {p.usuario.apellido}" if p.usuario else "Sin usuario"
         except Exception:
             nombre_u = "Usuario no encontrado"
 
-        # Formateo de fecha de la fila
         fecha_fila = localtime(p.create_at).strftime('%d/%m/%Y %H:%M') if p.create_at else "N/A"
+        descripcion = (p.descripcion[:50] + '...') if p.descripcion and len(p.descripcion) > 50 else (p.descripcion or '')
 
         data.append([
             str(p.id_pqrsf),
             p.tipo,
             p.estado,
             nombre_u,
+            descripcion,
             'Sí' if p.leida else 'No',
             fecha_fila,
         ])
 
-    # Estilo de la tabla
-    table = Table(data, repeatRows=1)
+    table = Table(data, repeatRows=1, colWidths=[30, 80, 70, 120, 200, 40, 90])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#28A745')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#a8d5b5')),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9f9f9')]),
+        ('BACKGROUND',    (0,0), (-1,0), colors.HexColor('#28A745')),
+        ('TEXTCOLOR',     (0,0), (-1,0), colors.white),
+        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0), (-1,0), 9),
+        ('FONTSIZE',      (0,1), (-1,-1), 8),
+        ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
+        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+        ('ROWBACKGROUNDS',(0,1), (-1,-1), [colors.white, colors.HexColor('#f0fff4')]),
+        ('GRID',          (0,0), (-1,-1), 0.5, colors.HexColor('#a8d5b5')),
+        ('TOPPADDING',    (0,0), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('LEFTPADDING',   (0,0), (-1,-1), 6),
+        ('RIGHTPADDING',  (0,0), (-1,-1), 6),
     ]))
-    
     elements.append(table)
-    doc.build(elements)
+
+    # ── Footer ──
+    def add_footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 8)
+        canvas.setFillColor(colors.HexColor('#888888'))
+        canvas.drawString(30, 15, 'SenaFOOD - Reporte de PQRSF')
+        canvas.drawRightString(landscape(A4)[0] - 30, 15, f'Página {doc.page}')
+        canvas.setStrokeColor(colors.HexColor('#28A745'))
+        canvas.setLineWidth(1)
+        canvas.line(30, 25, landscape(A4)[0] - 30, 25)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=add_footer, onLaterPages=add_footer)
     return response

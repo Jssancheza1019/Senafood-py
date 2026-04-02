@@ -1,0 +1,83 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+
+<div class="container-fluid mt-4 px-4">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+        <a href="{% url 'catalogo' %}" style="color:#28a745; font-size:1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h4 class="page-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Mi Carrito</h4>
+    </div>
+
+    {% if detalles %}
+    <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
+
+        <!-- Items -->
+        <div class="carrito-card">
+            {% for d in detalles %}
+            <div class="carrito-item">
+                {% if d.id_producto.imagen %}
+                <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
+                {% else %}
+                <div class="carrito-img-placeholder">🍽️</div>
+                {% endif %}
+
+                <div class="carrito-info">
+                    <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
+                    <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
+                </div>
+
+                <form method="POST" action="{% url 'actualizar_cantidad' d.id_detalle %}">
+                    {% csrf_token %}
+                    <div class="cantidad-wrapper">
+                        <button type="submit" name="cantidad" value="{{ d.cantidad|add:'-1' }}" class="btn-cantidad">−</button>
+                        <span style="font-weight:600; min-width:24px; text-align:center;">{{ d.cantidad }}</span>
+                        <button type="submit" name="cantidad" value="{{ d.cantidad|add:'1' }}" class="btn-cantidad">+</button>
+                    </div>
+                </form>
+
+                <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
+
+                <form method="POST" action="{% url 'eliminar_detalle' d.id_detalle %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-eliminar" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Resumen -->
+        <div class="carrito-card">
+            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">Resumen del pedido</h5>
+            <div style="color:#6c757d; font-size:0.85rem; margin-bottom:8px;">
+                {{ detalles|length }} producto{{ detalles|length|pluralize }} en tu carrito
+            </div>
+            <div class="total-box">
+                <span class="total-label">Total</span>
+                <span class="total-valor">${{ total|floatformat:0 }}</span>
+            </div>
+            <button class="btn-pagar">
+                <i class="fas fa-credit-card me-2"></i>Proceder al pago
+            </button>
+            <a href="{% url 'catalogo' %}" class="btn-seguir">
+                <i class="fas fa-arrow-left me-1"></i>Seguir comprando
+            </a>
+        </div>
+
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:60px 20px; color:#6c757d;">
+        <i class="fas fa-shopping-cart" style="font-size:3rem; margin-bottom:16px; display:block; color:#a8d5b5;"></i>
+        <p style="font-size:1.1rem;">Tu carrito está vacío</p>
+        <a href="{% url 'catalogo' %}" style="color:#28a745; font-weight:600; text-decoration:none;">
+            <i class="fas fa-book me-1"></i>Ir al catálogo
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

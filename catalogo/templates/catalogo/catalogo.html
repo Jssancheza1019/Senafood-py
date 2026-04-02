@@ -1,0 +1,78 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-4">
+    <h4 class="page-title"><i class="fas fa-book me-2"></i>Catálogo de Productos</h4>
+
+    <!-- Filtros -->
+    <form method="GET" action="">
+        <div class="filtros-wrapper">
+            <input type="text" name="buscar" class="search-input"
+                placeholder="🔍 Buscar producto..."
+                value="{{ filtro_buscar }}">
+            <select name="categoria" class="filtro-select">
+                <option value="">Todas las categorías</option>
+                {% for cat in categorias %}
+                <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-filtrar">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <a href="{% url 'catalogo' %}" class="btn-limpiar">
+                <i class="fas fa-times"></i> Limpiar
+            </a>
+        </div>
+    </form>
+
+    <!-- Grid -->
+    {% if productos %}
+    <div class="productos-grid">
+        {% for p in productos %}
+        <div class="producto-card">
+
+            {% if p.imagen %}
+            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="producto-img">
+            {% else %}
+            <div class="producto-img-placeholder">🍽️</div>
+            {% endif %}
+
+            <div class="producto-body">
+                <div class="producto-categoria">{{ p.categoria|default:"Sin categoría" }}</div>
+                <p class="producto-nombre">{{ p.nombre }}</p>
+
+                <div class="producto-precio">
+                    {% if p.en_promocion %}
+                        <span class="precio-promo">${{ p.precio_promocion|floatformat:0 }}</span>
+                        <span class="precio-tachado">${{ p.precio_venta|floatformat:0 }}</span>
+                        <span class="badge-promo"><i class="fas fa-tag"></i> Promo</span>
+                    {% else %}
+                        <span class="precio-normal">
+                            ${{ p.precio_venta|floatformat:0|default:p.costo_unitario|floatformat:0 }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar">
+                    <i class="fas fa-cart-plus"></i> Agregar al carrito
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <p>No se encontraron productos disponibles.</p>
+        {% if filtro_buscar or filtro_categoria %}
+        <a href="{% url 'catalogo' %}" class="btn-limpiar">Ver todos los productos</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block full_content %}
+<div class="container-fluid px-4 py-4">
+
+    <div style="text-align:center; padding:32px 0 24px 0;">
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="SenaFood Logo"
+            style="width:80px; height:80px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.12); margin-bottom:16px;">
+        <h1 style="color:#28a745; font-weight:700; font-size:1.8rem; margin-bottom:8px;">
+            ¡Bienvenido a SenaFOOD!
+        </h1>
+        <p style="color:#6c757d; font-size:0.95rem; max-width:480px; margin:0 auto;">
+            Explora la variedad y el sabor optimizando tu tiempo.
+        </p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; max-width:1100px; margin:0 auto;">
+
+        <a href="#" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #28a745; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#e9f7ef;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📖</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Catálogo</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Ver productos disponibles.</p>
+                </div>
+                <span style="color:#28a745;font-size:0.82rem;font-weight:600;">Ir al catálogo →</span>
+            </div>
+        </a>
+
+        <a href="{% url 'lista_productos' %}" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #28a745; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#e9f7ef;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📦</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Productos</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Gestionar el catálogo de productos.</p>
+                </div>
+                <span style="color:#28a745;font-size:0.82rem;font-weight:600;">Ver productos →</span>
+            </div>
+        </a>
+
+        {% if rol_usuario == 'Administrador' %}
+
+        <a href="{% url 'lista_inventario' %}" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #17a2b8; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#e3f8fb;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🏭</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Inventario</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Control de stock y ubicaciones.</p>
+                </div>
+                <span style="color:#17a2b8;font-size:0.82rem;font-weight:600;">Ver inventario →</span>
+            </div>
+        </a>
+
+        <a href="{% url 'usuarios_lista' %}" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #6f42c1; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#f0ebff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">👥</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Usuarios</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Administrar perfiles y permisos.</p>
+                </div>
+                <span style="color:#6f42c1;font-size:0.82rem;font-weight:600;">Gestionar usuarios →</span>
+            </div>
+        </a>
+
+        <a href="{% url 'lista_proveedores' %}" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #fd7e14; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#fff3e0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🚚</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Proveedores</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Gestionar proveedores y contactos.</p>
+                </div>
+                <span style="color:#fd7e14;font-size:0.82rem;font-weight:600;">Ver proveedores →</span>
+            </div>
+        </a>
+
+        <a href="#" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #6c757d; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#f4f4f4;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📋</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Órdenes de compra</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Próximamente disponible.</p>
+                </div>
+                <span style="color:#6c757d;font-size:0.82rem;font-weight:600;">Próximamente →</span>
+            </div>
+        </a>
+
+        {% endif %}
+
+        <a href="{% url 'lista_pqrsf' %}" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #dc3545; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#fdecea;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">✉️</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">PQRSF</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Peticiones, quejas y sugerencias.</p>
+                </div>
+                <span style="color:#dc3545;font-size:0.82rem;font-weight:600;">Ver PQRSF →</span>
+            </div>
+        </a>
+
+        <a href="#" style="text-decoration:none;">
+            <div style="background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-top:4px solid #ffc107; transition:transform 0.2s; display:flex; flex-direction:column; gap:12px;"
+                onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width:48px;height:48px;background:#fff8e1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🛒</div>
+                <div>
+                    <h3 style="color:#2e3b33;font-weight:700;font-size:1rem;margin:0 0 4px 0;">Gestión de pedidos</h3>
+                    <p style="color:#6c757d;font-size:0.82rem;margin:0;">Próximamente disponible.</p>
+                </div>
+                <span style="color:#ffc107;font-size:0.82rem;font-weight:600;">Próximamente →</span>
+            </div>
+        </a>
+
+    </div>
+</div>
+{% endblock full_content %}
