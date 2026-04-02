@@ -92,7 +92,7 @@
             <a href="{% url 'lista_productos' %}"><i class="fas fa-box"></i> Productos</a>
             <a href="#"><i class="fas fa-book"></i> Catálogo</a>
             {% if rol_usuario == 'Administrador' %}
-            <a href="#"><i class="fas fa-warehouse"></i> Inventario</a>
+            <a href="{% url 'lista_inventario' %}"><i class="fas fa-warehouse"></i> Inventario</a>
             <a href="{% url 'lista_proveedores' %}"><i class="fas fa-truck"></i> Proveedor</a>
             <a href="#"><i class="fas fa-file-invoice"></i> O C</a>
             {% endif %}

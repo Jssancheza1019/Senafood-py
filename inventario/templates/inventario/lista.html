@@ -1,0 +1,267 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="{% static 'inventario/css/styles.css' %}">
+
+<div class="container-fluid mt-4">
+    <h4 class="page-title">Gestión de Inventario</h4>
+
+    <div class="card-sena">
+
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alerta-exito"><i class="fas fa-check-circle"></i> {{ message }}</div>
+        {% else %}
+        <div class="alerta-error"><i class="fas fa-exclamation-triangle"></i> {{ message }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <!-- Cards resumen -->
+        <div class="cards-resumen-fila">
+            <div class="card-resumen">
+                <div class="card-resumen-icon" style="background:#e9f7ef;">
+                    <i class="fas fa-boxes" style="color:#28a745;"></i>
+                </div>
+                <div>
+                    <div class="card-resumen-label">Total productos</div>
+                    <div class="card-resumen-valor">{{ total_productos }}</div>
+                </div>
+            </div>
+            <div class="card-resumen" style="border-color:#dc3545;">
+                <div class="card-resumen-icon" style="background:#fdecea;">
+                    <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i>
+                </div>
+                <div>
+                    <div class="card-resumen-label">En alerta</div>
+                    <div class="card-resumen-valor" style="color:#dc3545;">{{ total_alerta }}</div>
+                </div>
+            </div>
+            <div class="card-resumen" style="border-color:#fd7e14;">
+                <div class="card-resumen-icon" style="background:#fff3e0;">
+                    <i class="fas fa-clock" style="color:#fd7e14;"></i>
+                </div>
+                <div>
+                    <div class="card-resumen-label">Por vencer (7 días)</div>
+                    <div class="card-resumen-valor" style="color:#fd7e14;">{{ total_por_vencer }}</div>
+                </div>
+            </div>
+            <div class="card-resumen">
+                <div class="card-resumen-icon" style="background:#e9f7ef;">
+                    <i class="fas fa-check-circle" style="color:#28a745;"></i>
+                </div>
+                <div>
+                    <div class="card-resumen-label">Stock OK</div>
+                    <div class="card-resumen-valor">{{ total_ok }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left d-flex gap-2">
+                <a href="{% url 'historial_inventario' %}" class="btn-nuevo">
+                    <i class="fas fa-history"></i> Historial
+                </a>
+            </div>
+            <span class="title-list">Estado actual del inventario</span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="search-wrapper">
+                    <label><i class="fas fa-search"></i> Buscar:</label>
+                    <input type="text" id="searchInventario" placeholder="Buscar...">
+                </div>
+                <a href="{% url 'realizar_inventario' %}" class="btn-nuevo" style="background:#28a745;">
+                    <i class="fas fa-clipboard-check"></i> Realizar inventario de hoy
+                </a>
+            </div>
+        </div>
+
+        {% if inventario_hoy %}
+        <div class="alerta-exito mb-3">
+            <i class="fas fa-check-circle"></i>
+            Inventario de hoy ya realizado por <strong>{{ inventario_hoy.nombre_responsable }}</strong>.
+            <a href="{% url 'detalle_inventario_diario' inventario_hoy.pk %}"
+                style="color:#fff;text-decoration:underline;">
+                Ver detalle
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Filtros -->
+        <form method="GET" action="">
+            <div class="filtros-wrapper">
+                <select name="categoria" class="filtro-select">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <select name="estado" class="filtro-select">
+                    <option value="">Todos los estados</option>
+                    <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>Activo</option>
+                    <option value="agotado" {% if filtro_estado == 'agotado' %}selected{% endif %}>Agotado</option>
+                    <option value="vencido" {% if filtro_estado == 'vencido' %}selected{% endif %}>Vencido</option>
+                    <option value="inactivo" {% if filtro_estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                </select>
+                <select name="stock" class="filtro-select">
+                    <option value="">Todo el stock</option>
+                    <option value="bajo" {% if filtro_stock == 'bajo' %}selected{% endif %}>Stock bajo</option>
+                    <option value="cero" {% if filtro_stock == 'cero' %}selected{% endif %}>Stock en cero</option>
+                </select>
+                <select name="vencer" class="filtro-select">
+                    <option value="">Todos</option>
+                    <option value="si" {% if filtro_vencer == 'si' %}selected{% endif %}>Por vencer (7 días)</option>
+                </select>
+                <button type="submit" class="btn-filtrar">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <a href="{% url 'lista_inventario' %}" class="btn-limpiar">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+        </form>
+
+        <div class="table-responsive w-100">
+            <table id="tablaInventario" class="table table-sm table-hover table-bordered">
+                <thead class="table-sena-header">
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock actual</th>
+                        <th>Alerta mín.</th>
+                        <th>Fecha vencimiento</th>
+                        <th>Ubicación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in productos_data %}
+                    <tr {% if item.en_alerta %}class="fila-alerta" {% endif %}>
+                        <td class="text-center fw-bold">{{ item.producto.id_producto }}</td>
+                        <td>
+                            {{ item.producto.nombre }}
+                            {% if item.por_vencer %}
+                            <span class="badge-vencido ms-1">
+                                <i class="fas fa-exclamation-circle"></i> Por vencer
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ item.producto.categoria|default:"—" }}</td>
+                        <td class="text-center">
+                            {% if item.en_alerta %}
+                            <span class="badge-stock-bajo">{{ item.producto.stock_actual }}</span>
+                            {% else %}
+                            {{ item.producto.stock_actual }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="alerta-min-badge"
+                                onclick="abrirModalAlerta({{ item.producto.id_producto }}, '{{ item.producto.nombre }}', {{ item.alerta_min }})"
+                                title="Clic para editar">
+                                {{ item.alerta_min }}
+                                <i class="fas fa-pencil-alt ms-1" style="font-size:0.65rem;"></i>
+                            </span>
+                        </td>
+                        <td class="text-center">{{ item.producto.fecha_vencimiento|default:"—" }}</td>
+                        <td class="text-center">{{ item.inv.ubicacion|default:"—" }}</td>
+                        <td class="text-center">
+                            {% if item.estado_calc == 'activo' %}
+                            <span class="badge-activo">Activo</span>
+                            {% elif item.estado_calc == 'agotado' %}
+                            <span class="badge-agotado">Agotado</span>
+                            {% elif item.estado_calc == 'vencido' %}
+                            <span class="badge-vencido">Vencido</span>
+                            {% elif item.estado_calc == 'inactivo' %}
+                            <span class="badge-inactivo">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'detalle_producto' item.producto.id_producto %}" class="btn-accion-ver">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            No hay productos registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal alerta mínima -->
+<div id="modalAlerta"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:10px; padding:24px; width:380px; border-top:3px solid #28a745;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h6 style="color:#28a745; margin:0; font-weight:700;">
+                <i class="fas fa-bell me-2"></i>Actualizar alerta mínima
+            </h6>
+            <span onclick="cerrarModal()" style="cursor:pointer; font-size:1.2rem; color:#666;">&times;</span>
+        </div>
+        <form method="POST" id="formAlerta">
+            {% csrf_token %}
+            <p style="color:#666; font-size:0.85rem; margin-bottom:12px;">
+                Producto: <strong id="nombreProductoAlerta"></strong>
+            </p>
+            <label style="font-weight:600; font-size:0.85rem; margin-bottom:4px; display:block;">Nueva alerta
+                mínima</label>
+            <input type="number" name="alerta_minimos" id="inputAlerta"
+                style="width:100%; padding:8px 12px; border:1px solid #28a745; border-radius:6px; font-size:0.9rem; margin-bottom:8px;">
+            <small style="color:#888;">El sistema marcará alerta cuando el stock llegue a este valor.</small>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button type="button" onclick="cerrarModal()" class="btn-limpiar">Cancelar</button>
+                <button type="submit" class="btn-nuevo" style="background:#28a745; margin-top:0;">
+                    <i class="fas fa-save me-1"></i>Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#tablaInventario').DataTable({
+            "pageLength": 10,
+            "order": [[0, "asc"]],
+            "language": {
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Sin registros",
+                "paginate": { "previous": "Anterior", "next": "Siguiente" }
+            }
+        });
+        $('#searchInventario').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+    });
+
+    function abrirModalAlerta(idProducto, nombre, alertaActual) {
+        document.getElementById('nombreProductoAlerta').textContent = nombre;
+        document.getElementById('inputAlerta').value = alertaActual;
+        document.getElementById('formAlerta').action = '/inventario/alerta/' + idProducto + '/';
+        var modal = document.getElementById('modalAlerta');
+        modal.style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalAlerta').style.display = 'none';
+    }
+
+    // Cerrar al hacer clic fuera
+    document.getElementById('modalAlerta').addEventListener('click', function (e) {
+        if (e.target === this) cerrarModal();
+    });
+</script>
+{% endblock %}

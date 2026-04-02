@@ -1,0 +1,179 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'inventario/css/styles.css' %}">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="container-fluid mt-4">
+    <h4 class="page-title">Detalle de Inventario</h4>
+
+    <div class="card-sena">
+
+        <!-- Cabecera del inventario -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="{% url 'historial_inventario' %}" class="btn-nuevo">
+                    <i class="fas fa-arrow-left"></i> Historial
+                </a>
+            </div>
+            <span class="title-list">
+                Inventario del {{ inv_diario.fecha }}
+            </span>
+            <div class="d-flex gap-2">
+                <a href="{% url 'exportar_pdf_inventario' inv_diario.pk %}"
+                   class="btn-nuevo" style="background:#dc3545;">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+                <a href="{% url 'exportar_excel_inventario' inv_diario.pk %}"
+                   class="btn-nuevo" style="background:#198754;">
+                    <i class="fas fa-file-excel"></i> Excel
+                </a>
+            </div>
+        </div>
+
+        <!-- Info cabecera -->
+        <div class="row g-3 mb-4 px-2">
+            <div class="col-md-3">
+                <div class="card-resumen">
+                    <div class="card-resumen-icon" style="background:#e9f7ef;">
+                        <i class="fas fa-user" style="color:#28a745;"></i>
+                    </div>
+                    <div>
+                        <div class="card-resumen-label">Responsable</div>
+                        <div class="card-resumen-valor" style="font-size:1rem;">
+                            {{ inv_diario.nombre_responsable|default:"—" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-resumen">
+                    <div class="card-resumen-icon" style="background:#e9f7ef;">
+                        <i class="fas fa-boxes" style="color:#28a745;"></i>
+                    </div>
+                    <div>
+                        <div class="card-resumen-label">Productos contados</div>
+                        <div class="card-resumen-valor">{{ inv_diario.total_productos }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-resumen" style="border-color:#fd7e14;">
+                    <div class="card-resumen-icon" style="background:#fff3e0;">
+                        <i class="fas fa-exchange-alt" style="color:#fd7e14;"></i>
+                    </div>
+                    <div>
+                        <div class="card-resumen-label">Con diferencias</div>
+                        <div class="card-resumen-valor" style="color:#fd7e14;">
+                            {{ inv_diario.total_diferencias }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-resumen">
+                    <div class="card-resumen-icon" style="background:#e9f7ef;">
+                        <i class="fas fa-check-circle" style="color:#28a745;"></i>
+                    </div>
+                    <div>
+                        <div class="card-resumen-label">Sin diferencias</div>
+                        <div class="card-resumen-valor">{{ sin_diferencia }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if inv_diario.observaciones %}
+        <div class="px-2 mb-3">
+            <div class="alerta-exito">
+                <i class="fas fa-comment-alt"></i>
+                <strong>Observaciones:</strong> {{ inv_diario.observaciones }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabla detalle -->
+        <div class="table-responsive w-100">
+            <table id="tablaDetalle" class="table table-sm table-hover table-bordered">
+                <thead class="table-sena-header">
+                    <tr>
+                        <th>#</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock anterior</th>
+                        <th>Stock físico</th>
+                        <th>Diferencia</th>
+                        <th>Alerta mín.</th>
+                        <th>Estado anterior</th>
+                        <th>Estado nuevo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in detalles %}
+                    <tr {% if d.diferencia < 0 %}class="fila-alerta"
+                        {% elif d.diferencia > 0 %}style="background:#d4edda;"{% endif %}>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="fw-semibold">{{ d.nombre_producto }}</td>
+                        <td class="text-center">{{ d.categoria|default:"—" }}</td>
+                        <td class="text-center">{{ d.stock_anterior }}</td>
+                        <td class="text-center">{{ d.stock_fisico }}</td>
+                        <td class="text-center fw-bold {{ d.diferencia_clase }}">
+                            {% if d.diferencia > 0 %}+{% endif %}{{ d.diferencia }}
+                        </td>
+                        <td class="text-center">{{ d.alerta_minimos }}</td>
+                        <td class="text-center">
+                            {% if d.estado_anterior == 'activo' %}
+                                <span class="badge-activo">Activo</span>
+                            {% elif d.estado_anterior == 'agotado' %}
+                                <span class="badge-agotado">Agotado</span>
+                            {% elif d.estado_anterior == 'vencido' %}
+                                <span class="badge-vencido">Vencido</span>
+                            {% elif d.estado_anterior == 'inactivo' %}
+                                <span class="badge-inactivo">Inactivo</span>
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if d.estado_nuevo == 'activo' %}
+                                <span class="badge-activo">Activo</span>
+                            {% elif d.estado_nuevo == 'agotado' %}
+                                <span class="badge-agotado">Agotado</span>
+                            {% elif d.estado_nuevo == 'vencido' %}
+                                <span class="badge-vencido">Vencido</span>
+                            {% elif d.estado_nuevo == 'inactivo' %}
+                                <span class="badge-inactivo">Inactivo</span>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            Sin registros de detalle.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#tablaDetalle').DataTable({
+            "pageLength": 25,
+            "order": [[1, "asc"]],
+            "language": {
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Sin registros",
+                "paginate": { "previous": "Anterior", "next": "Siguiente" }
+            }
+        });
+    });
+</script>
+{% endblock %}

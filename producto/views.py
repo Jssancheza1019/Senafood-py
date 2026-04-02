@@ -186,13 +186,22 @@ def desactivar_producto_view(request, id):
 
     producto = get_object_or_404(Producto, id_producto=id)
 
+    # Si está inactivo lo reactiva directamente
+    if not producto.es_activo:
+        producto.es_activo = True
+        producto.estado = 'activo'
+        producto.motivo_desactivacion = None
+        producto.save(update_fields=['es_activo', 'estado', 'motivo_desactivacion'])
+        messages.success(request, f'Producto {producto.nombre} reactivado correctamente.')
+        return redirect('lista_productos')
+
     if request.method == 'POST':
         motivo = request.POST.get('motivo')
         estado_nuevo = request.POST.get('estado')
         producto.es_activo = False
         producto.estado = estado_nuevo or 'inactivo'
         producto.motivo_desactivacion = motivo
-        producto.save()
+        producto.save(update_fields=['es_activo', 'estado', 'motivo_desactivacion'])
         messages.success(request, f'Producto {producto.nombre} desactivado.')
         return redirect('lista_productos')
 

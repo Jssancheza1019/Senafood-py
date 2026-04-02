@@ -11,4 +11,5 @@ urlpatterns = [
     path('notificaciones/', include('notificaciones.urls')), # ruta notificaciones
     path('proveedores/', include('proveedor.urls')), # ruta proveedores
     path('productos/', include('producto.urls')),#ruta producto
+    path('inventario/', include('inventario.urls')),#ruta inventario
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
