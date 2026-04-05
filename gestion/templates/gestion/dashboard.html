@@ -232,9 +232,10 @@
             <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
 
             {% if rol_usuario == 'Administrador' %}
-            <a href="{% url 'lista_productos' %}"><i class="fas fa-box"></i> Productos</a>
             <a href="{% url 'catalogo' %}"><i class="fas fa-book"></i> Catálogo</a>
+            <a href="{% url 'lista_productos' %}"><i class="fas fa-box"></i> Productos</a>
             <a href="{% url 'lista_inventario' %}"><i class="fas fa-warehouse"></i> Inventario</a>
+            <a href="{% url 'lista_ventas' %}"><i class="fas fa-chart-line"></i> Ventas</a>
             <a href="{% url 'lista_proveedores' %}"><i class="fas fa-truck"></i> Proveedores</a>
             <a href="{% url 'usuarios_lista' %}"><i class="fas fa-users"></i> Usuarios</a>
             <a href="{% url 'vista_vendedor' %}"><i class="fas fa-store"></i> Pedidos</a>

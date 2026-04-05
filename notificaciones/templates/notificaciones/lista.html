@@ -287,14 +287,17 @@
                         </td>
                         <td class="text-center">{{ n.fechaenvio|date:"d/m/Y H:i" }}</td>
                         <td class="text-center">
-                            {% if n.tipo == 'pqrsf' and n.pqrsf %}
-                            <a href="{% url 'detalle_pqrsf' n.pqrsf.id_pqrsf %}" class="btn-accion-ver">
-                                <i class="fas fa-eye"></i> Ver
-                            </a>
-                            {% else %}
-                            <span class="text-muted" style="font-size:0.78rem;">—</span>
-                            {% endif %}
-                        </td>
+                        {% if n.tipo == 'pqrsf' and n.pqrsf %}
+                        <a href="{% url 'detalle_pqrsf' n.pqrsf.id_pqrsf %}" class="btn-accion-ver">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        {% elif n.tipo == 'stock' %}
+                        <a href="{% url 'lista_productos' %}" class="btn-accion-ver" style="background:#fd7e14;">
+                            <i class="fas fa-box"></i> Ver productos
+                        </a>
+                        <span class="text-muted" style="font-size:0.78rem;">—</span>
+                        {% endif %}
+                    </td>
                     </tr>
                     {% empty %}
                     <tr>

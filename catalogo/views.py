@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
 from gestion.models import Producto, Carrito, Detallecarrito, Usuario
+from datetime import date
 
 
 def sesion_requerida(view_func):
@@ -184,9 +185,7 @@ def eliminar_detalle(request, id_detalle):
 
     return redirect('ver_carrito')
 
-# ─────────────────────────────────────────
 # CONFIRMAR PEDIDO (cliente)
-# ─────────────────────────────────────────
 @sesion_requerida
 def confirmar_pedido(request):
     from django.contrib import messages
@@ -199,7 +198,6 @@ def confirmar_pedido(request):
         messages.error(request, 'Tu carrito está vacío.')
         return redirect('ver_carrito')
 
-    # Verificar stock de todos los productos antes de confirmar
     errores = []
     for d in detalles:
         stock_disponible = d.id_producto.stock or 0
@@ -213,12 +211,12 @@ def confirmar_pedido(request):
             messages.error(request, error)
         return redirect('ver_carrito')
 
-    carrito.estado    = 'pendiente_pago'
-    carrito.update_at = timezone.now()
+    carrito.estado             = 'pendiente_pago'
+    carrito.fecha_confirmacion = timezone.now()
+    carrito.update_at          = timezone.now()
     carrito.save()
 
     return redirect('pedido_confirmado')
-
 # ─────────────────────────────────────────
 # PEDIDO CONFIRMADO (cliente)
 # ─────────────────────────────────────────
@@ -272,9 +270,42 @@ def registrar_pago(request, id_carrito):
 
     return redirect('vista_vendedor')
 
+# ─────────────────────────────────────────
+# Notificar stock bajo
+# ─────────────────────────────────────────
+def notificar_stock_bajo(producto):
+    from notificaciones.models import Notificacion
+    from inventario.models import Inventario
+
+    try:
+        inv = Inventario.objects.get(idproducto=producto.id_producto)
+        alerta_min = inv.alerta_minimos
+    except Inventario.DoesNotExist:
+        alerta_min = 5
+
+    if (producto.stock or 0) <= alerta_min:
+        admins = Usuario.objects.filter(
+            rol__nombre_rol='Administrador',
+            es_activo=True
+        )
+        for admin in admins:
+            ya_notificado = Notificacion.objects.filter(
+                usuario=admin,
+                tipo='stock',        # ← corregido
+                leida=False,
+                mensaje__icontains=producto.nombre
+            ).exists()
+
+            if not ya_notificado:
+                Notificacion.objects.create(
+                    usuario = admin,
+                    tipo    = 'stock',  # ← corregido
+                    mensaje = f'Stock bajo: "{producto.nombre}" tiene {producto.stock} unidades (mínimo: {alerta_min})',
+                )
+
 
 # ─────────────────────────────────────────
-# CONFIRMAR ENTREGA (entregador)
+# CONFIRMAR ENTREGA — actualizado
 # ─────────────────────────────────────────
 @sesion_requerida
 def confirmar_entrega(request, id_carrito):
@@ -285,12 +316,10 @@ def confirmar_entrega(request, id_carrito):
     carrito  = get_object_or_404(Carrito, pk=id_carrito, estado='pendiente_entrega')
     detalles = Detallecarrito.objects.filter(id_carrito=carrito)
 
-    # Descontar stock de cada producto
     for d in detalles:
-        producto = d.id_producto
+        producto       = d.id_producto
         producto.stock = max(0, (producto.stock or 0) - d.cantidad)
 
-        # Recalcular estado
         if producto.stock <= 0:
             producto.estado = 'agotado'
         elif producto.fecha_vencimiento and producto.fecha_vencimiento < date.today():
@@ -301,8 +330,12 @@ def confirmar_entrega(request, id_carrito):
         producto.update_at = timezone.now()
         producto.save()
 
-    carrito.estado    = 'entregado'
-    carrito.update_at = timezone.now()
+        # Verificar stock y notificar si está bajo
+        notificar_stock_bajo(producto)
+
+    carrito.estado        = 'entregado'
+    carrito.fecha_entrega = timezone.now()
+    carrito.update_at     = timezone.now()
     carrito.save()
 
     return redirect('vista_vendedor')

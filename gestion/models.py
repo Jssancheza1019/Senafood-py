@@ -59,15 +59,17 @@ class Carrito(models.Model):
         ('entregado',         'Entregado'),
     ]
 
-    id_carrito     = models.AutoField(primary_key=True)
-    usuario        = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='id_usuario')
-    total          = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    estado         = models.CharField(max_length=50, blank=True, null=True, choices=ESTADOS)
-    fecha          = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    metodopago     = models.CharField(db_column='metodoPago', max_length=50, blank=True, null=True)
-    numerofactura  = models.CharField(db_column='numeroFactura', max_length=50, blank=True, null=True)
-    create_at      = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    update_at      = models.DateTimeField(auto_now=True, blank=True, null=True)
+    id_carrito          = models.AutoField(primary_key=True)
+    usuario             = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='id_usuario')
+    total               = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    estado              = models.CharField(max_length=50, blank=True, null=True, choices=ESTADOS)
+    fecha               = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    metodopago          = models.CharField(db_column='metodoPago', max_length=50, blank=True, null=True)
+    numerofactura       = models.CharField(db_column='numeroFactura', max_length=50, blank=True, null=True)
+    fecha_confirmacion  = models.DateTimeField(blank=True, null=True)
+    fecha_entrega       = models.DateTimeField(blank=True, null=True)
+    create_at           = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    update_at           = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
         managed  = True
@@ -257,7 +259,13 @@ class Producto(models.Model):
 
     @property
     def stock_bajo(self):
-        return self.stock is not None and self.stock <= 10
+        try:
+            from inventario.models import Inventario
+            inv = Inventario.objects.get(idproducto=self.id_producto)
+            alerta_min = inv.alerta_minimos or 10
+        except Exception:
+            alerta_min = 10
+        return self.stock is not None and self.stock <= alerta_min
 
     @property
     def en_promocion(self):

@@ -1,0 +1,124 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'ventas/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-4">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+        <a href="{% url 'lista_ventas' %}" style="color:#28a745; font-size:1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h4 class="page-title mb-0">
+            <i class="fas fa-receipt me-2"></i>Detalle Venta #{{ carrito.id_carrito }}
+        </h4>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
+
+        <!-- Productos -->
+        <div class="card-sena">
+            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
+                <i class="fas fa-box me-2" style="color:#28a745;"></i>Productos
+            </h5>
+            <table class="table table-sm table-hover">
+                <thead class="table-sena-header">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio unit.</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in detalles %}
+                    <tr>
+                        <td class="fw-semibold">{{ d.id_producto.nombre }}</td>
+                        <td class="text-center">{{ d.id_producto.categoria|default:"—" }}</td>
+                        <td class="text-center">${{ d.precio_unitario|floatformat:0 }}</td>
+                        <td class="text-center">{{ d.cantidad }}</td>
+                        <td class="text-center fw-bold" style="color:#28a745;">
+                            ${{ d.subtotal|floatformat:0 }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background:#f0fff4;">
+                        <td colspan="4" class="text-end fw-bold">Total:</td>
+                        <td class="text-center fw-bold fs-5" style="color:#28a745;">
+                            ${{ carrito.total|floatformat:0 }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Info -->
+        <div>
+            <div class="card-sena mb-3">
+                <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
+                    <i class="fas fa-user me-2" style="color:#28a745;"></i>Cliente
+                </h5>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Nombre</div>
+                    <div class="detalle-valor">
+                        {{ carrito.usuario.nombre }} {{ carrito.usuario.apellido }}
+                    </div>
+                </div>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Email</div>
+                    <div class="detalle-valor">{{ carrito.usuario.email|default:"—" }}</div>
+                </div>
+            </div>
+
+            <div class="card-sena mb-3">
+                <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
+                    <i class="fas fa-info-circle me-2" style="color:#28a745;"></i>Detalle
+                </h5>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Método de pago</div>
+                    <div class="detalle-valor">{{ carrito.metodopago|default:"—"|capfirst }}</div>
+                </div>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Confirmado</div>
+                    <div class="detalle-valor">
+                        {% if carrito.fecha_confirmacion %}
+                            {{ carrito.fecha_confirmacion|date:"d/m/Y H:i" }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Entregado</div>
+                    <div class="detalle-valor">
+                        {% if carrito.fecha_entrega %}
+                            {{ carrito.fecha_entrega|date:"d/m/Y H:i" }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="detalle-seccion">
+                    <div class="detalle-label">Tiempo de entrega</div>
+                    <div class="detalle-valor" style="color:#fd7e14;">
+                        {% if tiempo_entrega %}
+                            {{ tiempo_entrega }} minutos
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#f0fff4; border-radius:10px; padding:16px 20px;
+                        display:flex; justify-content:space-between; align-items:center;
+                        border:1px solid #d4edda;">
+                <span style="font-weight:700; color:#2e3b33; font-size:1rem;">Total</span>
+                <span style="font-size:1.5rem; font-weight:700; color:#28a745;">
+                    ${{ carrito.total|floatformat:0 }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

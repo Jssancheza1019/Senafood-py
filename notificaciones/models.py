@@ -8,6 +8,7 @@ class Notificacion(models.Model):
         ('pqrsf',    'PQRSF'),
         ('carrito',  'Carrito / Pedido'),
         ('sistema',  'Sistema'),
+        ('stock',    'Stock bajo'),
     ]
 
     id_notificacion = models.AutoField(primary_key=True)

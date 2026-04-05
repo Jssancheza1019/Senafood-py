@@ -161,7 +161,7 @@
 </div>
 
 <script>
-    const total = {{ carrito.total|floatformat:0 }};
+    const total = parseFloat("{{ carrito.total }}") || 0;
 
     function calcularCambio() {
         const recibido    = parseFloat(document.getElementById('valorRecibido').value) || 0;
