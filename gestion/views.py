@@ -119,10 +119,19 @@ def registro_view(request):
 def dashboard_view(request):
     if 'usuario_nombre' not in request.session:
         return redirect('login')
-    
+
+    rol = request.session.get('usuario_rol', '')
+
+    if rol == 'Vendedor':
+        return redirect('vista_vendedor')
+
+    if rol == 'Cliente':
+        return redirect('catalogo')
+
+    # Solo Administrador ve el dashboard
     return render(request, 'gestion/inicio.html', {
-        'nombre_usuario': request.session['usuario_nombre'],
-        'rol_usuario':    request.session.get('usuario_rol', ''),
+        'nombre_usuario': request.session.get('usuario_nombre', ''),
+        'rol_usuario':    rol,
     })
 def perfil_view(request):
     if 'usuario_id' not in request.session:

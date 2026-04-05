@@ -229,9 +229,8 @@
 
         <!-- Links -->
         <div class="nav-links">
-            <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
-
             {% if rol_usuario == 'Administrador' %}
+            <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
             <a href="{% url 'catalogo' %}"><i class="fas fa-book"></i> Catálogo</a>
             <a href="{% url 'lista_productos' %}"><i class="fas fa-box"></i> Productos</a>
             <a href="{% url 'lista_inventario' %}"><i class="fas fa-warehouse"></i> Inventario</a>
@@ -250,7 +249,9 @@
             <a href="{% url 'catalogo' %}"><i class="fas fa-book"></i> Catálogo</a>
             {% endif %}
 
+            {% if rol_usuario != 'Vendedor' %}
             <a href="{% url 'lista_pqrsf' %}"><i class="fas fa-envelope-open-text"></i> PQRSF</a>
+            {% endif %}
         </div>
 
         <!-- Campana + Usuario -->
