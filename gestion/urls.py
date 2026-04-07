@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'), # <--- Solo esta para salir
     path('perfil/', views.perfil_view, name='perfil'),
     path('cambiar-password/', views.cambiar_password_view, name='cambiar_password'),
+    path('solicitar-reset/', views.solicitar_reset_view, name='solicitar_reset'),
+    path('restablecer-password/<uuid:token>/', views.restablecer_password_view, name='restablecer_password'),
 ]

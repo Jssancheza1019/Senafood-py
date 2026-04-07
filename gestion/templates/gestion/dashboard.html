@@ -253,15 +253,16 @@
             <a href="{% url 'lista_pqrsf' %}"><i class="fas fa-envelope-open-text"></i> PQRSF</a>
             {% endif %}
         </div>
-
+        
         <!-- Campana + Usuario -->
         <div class="nav-right">
+            {% if rol_usuario != 'Vendedor' %}
             <div class="campana-wrapper" id="campanaWrapper" onclick="window.location.href='/notificaciones/'">
                 <i class="fas fa-bell"></i>
                 <span id="contadorNotif"
                     style="display:none; position:absolute; top:2px; right:2px; background:#dc3545; color:white; border-radius:50%; font-size:0.6rem; font-weight:700; width:15px; height:15px; text-align:center; line-height:15px;">0</span>
             </div>
-
+            {% endif %}
             <div class="user-menu-container" id="userMenuWrapper">
                 <div class="user-info" onclick="toggleUserMenu()">
                     <i class="fas fa-user-circle fa-lg"></i>

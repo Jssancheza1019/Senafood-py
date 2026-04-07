@@ -78,7 +78,7 @@
                 </div>
 
                 {% if p.stock_actual > 0 %}
-                <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar">
+                <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar"
                     <i class="fas fa-cart-plus"></i> Agregar al carrito
                 </a>
                 {% else %}

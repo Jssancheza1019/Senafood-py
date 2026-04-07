@@ -323,3 +323,209 @@ hr {
 .login-container button:hover {
     background-color: var(--sena-green);
 }
+
+/* --- FOOTER LOGIN --- */
+.login-container .footer {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #666;
+    line-height: 2;
+}
+
+.login-container .footer a {
+    color: var(--sena-green);
+    text-decoration: none;
+    font-weight: 700;
+    border-bottom: 1px solid transparent;
+    transition: var(--transition);
+}
+
+.login-container .footer a:hover {
+    color: var(--sena-gold);
+    border-bottom: 1px solid var(--sena-gold);
+}
+
+/* ============================================================
+/* ============================================================
+NAVBAR PÚBLICO
+   ============================================================ */
+.public-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background: #28a745;
+    backdrop-filter: blur(10px);
+    border-bottom: 3px solid var(--sena-green);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+
+.public-navbar__inner {
+    max-width: 100%;
+    margin: 0;
+    padding: 0 32px;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.public-navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.public-navbar__logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.public-navbar__name {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.public-navbar__name span {
+    color: var(--sena-gold);
+}
+
+.public-navbar__links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+}
+
+.public-navbar__links li a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d4edda;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.public-navbar__links li a i {
+    font-size: 12px;
+    color: var(--sena-gold);
+}
+
+.public-navbar__links li a:hover {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+}
+
+.public-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.public-navbar__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.public-navbar__btn--outline {
+    border: 2px solid #d4edda;
+    color: #d4edda;
+    background: transparent;
+}
+
+.public-navbar__btn--outline:hover {
+    background: #d4edda;
+    color: var(--sena-dark);
+}
+
+.public-navbar__btn--solid {
+    background: var(--sena-green);
+    color: white;
+    border: 2px solid var(--sena-green);
+}
+
+.public-navbar__btn--solid:hover {
+    background: var(--sena-gold);
+    border-color: var(--sena-gold);
+    color: var(--sena-dark);
+}
+
+.public-navbar__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    margin-left: auto;
+}
+
+.public-navbar__hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: var(--transition);
+}
+
+.public-page-body {
+    padding-top: 64px;
+}
+
+@media (max-width: 860px) {
+    .public-navbar__links,
+    .public-navbar__actions {
+        display: none;
+    }
+
+    .public-navbar__hamburger {
+        display: flex;
+    }
+
+    .public-navbar__links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(26, 58, 26, 0.97);
+        border-bottom: 2px solid var(--sena-green);
+        padding: 12px 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        gap: 0;
+    }
+
+    .public-navbar__links.open li a {
+        padding: 12px 24px;
+        border-radius: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+}

@@ -174,7 +174,7 @@
 
         <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo" class="detalle-logo">
         <div class="detalle-brand">SenaFOOD</div>
-        <div class="detalle-titulo">PQRSF #{{ pqrsf.id_pqrsf }}</div>
+        <div class="detalle-titulo">{{ pqrsf.tipo }}</div>
 
         {% if messages %}
             {% for message in messages %}
@@ -259,12 +259,8 @@
 
             <button type="submit" class="btn-guardar">
                 <i class="fas fa-save me-2"></i> GUARDAR CAMBIOS
-            </button>
-            {% else %}
-                <div class="info-readonly">
-                    <i class="fas fa-info-circle"></i>
-                    Solo el administrador puede modificar esta solicitud.
-                </div>
+            </button>            
+                
             {% endif %}
         </form>
 

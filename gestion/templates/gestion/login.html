@@ -1,25 +1,30 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SenaFood - Iniciar Sesión</title>
     <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="auth-body">
+
+<body class="auth-body public-page-body">
+    {% include 'gestion/navbar_publico.html' %}
 
     <div class="login-container">
         <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
         <div class="brand-text">SENA FOOD</div>
 
         <h2>Iniciar Sesión</h2>
-            {% if error %}
-                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-size: 14px;">
+        {% if error %}
+        <div
+            style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-size: 14px;">
             ⚠️ {{ error }}
-                </div>
-            {% endif %}
-        
+        </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
             <input type="email" name="email" placeholder="Email" value="{{ email_previo }}" required>
@@ -28,9 +33,11 @@
         </form>
 
         <div class="footer">
-            ¿No tienes cuenta? <a href="/registro/">Regístrate aquí</a>
+            ¿No tienes cuenta? <a href="/registro/">Regístrate aquí</a><br>
+            ¿Olvidaste tu contraseña? <a href="{% url 'solicitar_reset' %}">Restablécela aquí</a>
         </div>
     </div>
 
 </body>
+
 </html>

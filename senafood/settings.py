@@ -141,3 +141,11 @@ BaseDatabaseWrapper.check_database_version_supported = lambda self: None
 
 from django.db.backends.mysql.features import DatabaseFeatures
 DatabaseFeatures.can_return_columns_from_insert = False
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'senafoodcdsf@gmail.com'      # ← tu correo Gmail
+EMAIL_HOST_PASSWORD = 'dsma cgli pplk wqnm'  # ← contraseña de aplicación (ver nota)
+DEFAULT_FROM_EMAIL = 'SenaFood <senafoodcdsf@gmail.com>'

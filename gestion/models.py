@@ -2,6 +2,7 @@ from django.db import models
 
 from django.db import models
 from pqrs.models import PQRSF
+import uuid
 
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -318,6 +319,22 @@ class RolPermiso(models.Model):
         managed = True
         db_table = 'rol_permiso'
 
+class TokenRestablecimiento(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    usado = models.BooleanField(default=False)
 
+    class Meta:
+        db_table = 'token_restablecimiento'
+        verbose_name = 'Token de Restablecimiento'
+
+    def esta_vigente(self):
+        from django.utils import timezone
+        import datetime
+        # El token dura 30 minutos
+        ahora = datetime.datetime.now()
+        diferencia = ahora - self.creado_en
+        return not self.usado and diferencia.total_seconds() < 1800
 
 

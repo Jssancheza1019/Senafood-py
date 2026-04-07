@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenaFood - Restablecer Contraseña</title>
+    <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body class="auth-body public-page-body">
+    {% include 'gestion/navbar_publico.html' %}
+    <div class="login-container">
+        <img src="{% static 'gestion/img/logo.jpg' %}" alt="Logo SenaFood" class="login-logo">
+        <div class="brand-text">SENA FOOD</div>
+        <h2>Restablecer Contraseña</h2>
+
+        {% if mensaje %}
+            <div style="background-color:#d4edda;color:#155724;padding:10px;border-radius:5px;margin-bottom:15px;border:1px solid #c3e6cb;font-size:14px;">
+                ✅ {{ mensaje }}
+            </div>
+        {% endif %}
+
+        {% if not mensaje %}
+        <p style="font-size:14px;color:#555;margin-bottom:18px;">
+            Ingresa tu correo y te enviaremos un enlace para crear una nueva contraseña.
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Tu correo registrado" required>
+            <button type="submit">ENVIAR ENLACE</button>
+        </form>
+        {% endif %}
+
+        <div class="footer">
+            <a href="{% url 'login' %}">← Volver al inicio de sesión</a>
+        </div>
+    </div>
+</body>
+</html>

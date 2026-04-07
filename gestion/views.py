@@ -3,8 +3,11 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from .models import Usuario, Rol 
 from django.contrib.auth import logout
-# Nota: Si usas un modelo manual, login_required puede fallar si no está configurado en settings.
-# Usaremos la validación de sesión que ya tienes para ser consistentes.
+from django.core.mail import send_mail
+from django.conf import settings
+import datetime
+from .models import TokenRestablecimiento
+from django.core.mail import EmailMultiAlternatives
 
 def bienvenida_view(request):
     if 'usuario_id' in request.session:
@@ -220,3 +223,164 @@ def lista_usuarios_view(request):
         'usuarios': usuarios,
         'nombre_usuario': usuario.nombre,
     })
+
+def solicitar_reset_view(request):
+    mensaje = None
+    error = None
+
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        try:
+            usuario = Usuario.objects.get(email=email, es_activo=True)
+            # Invalidar tokens anteriores del mismo usuario
+            TokenRestablecimiento.objects.filter(usuario=usuario, usado=False).update(usado=True)
+            # Crear nuevo token
+            token_obj = TokenRestablecimiento.objects.create(usuario=usuario)
+            link = request.build_absolute_uri(f'/restablecer-password/{token_obj.token}/')
+
+            # Enviar correo
+            asunto = 'Restablecer contraseña — SenaFood'
+
+            texto_plano = (
+                f'Hola {usuario.nombre},\n\n'
+                f'Recibimos una solicitud para restablecer tu contraseña.\n'
+                f'Enlace válido por 30 minutos:\n{link}\n\n'
+                f'Si no fuiste tú, ignora este mensaje.\n— Equipo SenaFood'
+            )
+
+            html = f"""
+                <!DOCTYPE html>
+                <html lang="es">
+                <head><meta charset="UTF-8"></head>
+                <body style="margin:0;padding:0;background:#f0f4f0;font-family:Arial,sans-serif;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4f0;padding:40px 0;">
+                    <tr><td align="center">
+                    <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+                        <!-- HEADER -->
+                        <tr>
+                        <td style="background:#28a745;padding:30px;text-align:center;">
+                            <h1 style="margin:0;color:#ffffff;font-size:24px;letter-spacing:2px;">🍽️ SENA FOOD</h1>
+                            <p style="margin:6px 0 0;color:#c8f7d0;font-size:13px;">Sistema de Gestión de Restaurante</p>
+                        </td>
+                        </tr>
+
+                        <!-- BODY -->
+                        <tr>
+                        <td style="padding:36px 40px;">
+                            <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 12px;">Restablece tu contraseña</h2>
+                        <p style="color:#444;font-size:15px;line-height:1.6;margin:0 0 10px;">
+                        Hola <strong>{usuario.nombre}</strong>,
+                            </p>
+                            <p style="color:#444;font-size:15px;line-height:1.6;margin:0 0 28px;">
+                            Recibimos una solicitud para restablecer la contraseña de tu cuenta en SenaFood.
+                            Haz clic en el botón para crear una nueva. Este enlace es válido por <strong>30 minutos</strong>.
+                            </p>
+
+                            <!-- BOTÓN -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr><td align="center" style="padding-bottom:28px;">
+                                <a href="{link}"
+                                style="background:#28a745;color:#ffffff;padding:14px 36px;border-radius:8px;
+                                        text-decoration:none;font-size:15px;font-weight:bold;display:inline-block;
+                                        letter-spacing:0.5px;">
+                                Restablecer contraseña
+                                </a>
+                            </td></tr>
+                            </table>
+
+                            <!-- ENLACE ALTERNATIVO -->
+                            <p style="color:#888;font-size:12px;line-height:1.6;margin:0 0 8px;">
+                            Si el botón no funciona, copia y pega este enlace en tu navegador:
+                            </p>
+                            <p style="margin:0;">
+                            <a href="{link}" style="color:#28a745;font-size:12px;word-break:break-all;">{link}</a>
+                            </p>
+
+                            <hr style="border:none;border-top:1px solid #e8e8e8;margin:28px 0;">
+
+                            <p style="color:#aaa;font-size:12px;line-height:1.6;margin:0;text-align:center;">
+                            Si no solicitaste este cambio, puedes ignorar este mensaje.<br>
+                            Tu contraseña permanecerá sin cambios.
+                            </p>
+                        </td>
+                        </tr>
+
+                        <!-- FOOTER -->
+                        <tr>
+                        <td style="background:#f9fff9;padding:18px 40px;text-align:center;border-top:1px solid #e8f5e9;">
+                        <p style="margin:0;color:#aaa;font-size:12px;">
+                            © 2026 SenaFood · Todos los derechos reservados
+                            </p>
+                        </td>
+                        </tr>
+
+                    </table>
+                    </td></tr>
+                </table>
+            </body>
+            </html>
+                """
+
+            correo = EmailMultiAlternatives(
+                subject=asunto,
+                body=texto_plano,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email],
+            )
+            correo.attach_alternative(html, "text/html")
+            correo.send(fail_silently=False)
+
+            mensaje = "Te enviamos un enlace a tu correo. Revisa también la carpeta de spam."
+
+        except Usuario.DoesNotExist:
+            mensaje = "Te enviamos un enlace a tu correo. Revisa también la carpeta de spam."
+
+    return render(request, 'gestion/solicitar_reset.html', {
+        'mensaje': mensaje,
+        'error': error,
+    })
+
+
+def restablecer_password_view(request, token):
+    from django.contrib.auth.hashers import make_password
+    error = None
+    exito = None
+
+    try:
+        token_obj = TokenRestablecimiento.objects.get(token=token)
+    except TokenRestablecimiento.DoesNotExist:
+        return render(request, 'gestion/restablecer_password.html', {
+            'error': 'El enlace no es válido.',
+            'token_invalido': True,
+        })
+
+    if not token_obj.esta_vigente():
+        return render(request, 'gestion/restablecer_password.html', {
+            'error': 'El enlace expiró o ya fue usado. Solicita uno nuevo.',
+            'token_invalido': True,
+        })
+
+    if request.method == 'POST':
+        nueva = request.POST.get('nueva_password', '')
+        confirmar = request.POST.get('confirmar_password', '')
+
+        if len(nueva) < 8:
+            error = 'La contraseña debe tener al menos 8 caracteres.'
+        elif nueva != confirmar:
+            error = 'Las contraseñas no coinciden.'
+        else:
+            token_obj.usuario.password = make_password(nueva)
+            token_obj.usuario.save()
+            token_obj.usado = True
+            token_obj.save()
+            exito = True
+
+    return render(request, 'gestion/restablecer_password.html', {
+        'error': error,
+        'exito': exito,
+        'token': token,
+    })
+
+
+    

@@ -1,0 +1,37 @@
+{% load static %}
+<nav class="public-navbar">
+    <div class="public-navbar__inner">
+
+        <a href="{% url 'bienvenida' %}" class="public-navbar__brand">
+            <img src="{% static 'gestion/img/logo.png' %}" alt="SenaFood" class="public-navbar__logo">
+            <span class="public-navbar__name">SENA<span>FOOD</span></span>
+        </a>
+
+        <ul class="public-navbar__links" id="navLinks">
+            <li><a href="{% url 'bienvenida' %}"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#nosotros"><i class="fas fa-users"></i> Nosotros</a></li>
+            <li><a href="#contacto"><i class="fas fa-envelope"></i> Contacto</a></li>
+            <li><a href="https://serviciosfinancierosena.blogspot.com/" target="_blank"><i class="fas fa-blog"></i> Blog SENA</a></li>
+            <li><a href="https://www.facebook.com/share/1CVWn9uh2K/" target="_blank"><i class="fab fa-facebook"></i> Facebook</a></li>
+        </ul>
+
+        <div class="public-navbar__actions">
+            <a href="{% url 'login' %}" class="public-navbar__btn public-navbar__btn--outline">
+                <i class="fas fa-sign-in-alt"></i> Ingresar
+            </a>
+            <a href="{% url 'registro' %}" class="public-navbar__btn public-navbar__btn--solid">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </a>
+        </div>
+
+        <button class="public-navbar__hamburger" id="hamburger" aria-label="Menú">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<script>
+    document.getElementById('hamburger').addEventListener('click', function() {
+        document.getElementById('navLinks').classList.toggle('open');
+    });
+</script>

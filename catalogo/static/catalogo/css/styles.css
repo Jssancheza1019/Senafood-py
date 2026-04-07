@@ -178,7 +178,8 @@ body, .container-fluid { font-family: 'Poppins', sans-serif; }
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    width: 100%;
+    width: 100% !important;
+    box-sizing: border-box !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
