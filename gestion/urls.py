@@ -11,4 +11,5 @@ urlpatterns = [
     path('cambiar-password/', views.cambiar_password_view, name='cambiar_password'),
     path('solicitar-reset/', views.solicitar_reset_view, name='solicitar_reset'),
     path('restablecer-password/<uuid:token>/', views.restablecer_password_view, name='restablecer_password'),
+    path('contacto/', views.contacto_view, name='contacto'),
 ]

@@ -382,5 +382,86 @@ def restablecer_password_view(request, token):
         'token': token,
     })
 
+def contacto_view(request):
+    enviado = False
+    error = None
 
-    
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        email = request.POST.get('email', '').strip()
+        asunto = request.POST.get('asunto', '').strip()
+        mensaje = request.POST.get('mensaje', '').strip()
+
+        if nombre and email and asunto and mensaje:
+            try:
+                html = f"""
+                <!DOCTYPE html>
+                <html lang="es">
+                <head><meta charset="UTF-8"></head>
+                <body style="margin:0;padding:0;background:#f0f4f0;font-family:Arial,sans-serif;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4f0;padding:40px 0;">
+                    <tr><td align="center">
+                    <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                        <tr>
+                        <td style="background:#28a745;padding:30px;text-align:center;">
+                            <h1 style="margin:0;color:#ffffff;font-size:24px;letter-spacing:2px;">🍽️ SENA FOOD</h1>
+                            <p style="margin:6px 0 0;color:#c8f7d0;font-size:13px;">Nuevo mensaje de contacto</p>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td style="padding:36px 40px;">
+                            <h2 style="color:#1a1a1a;font-size:18px;margin:0 0 20px;">📬 {asunto}</h2>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+                            <tr>
+                                <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                                <span style="color:#888;font-size:13px;">Nombre</span><br>
+                                <strong style="color:#333;font-size:15px;">{nombre}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                                <span style="color:#888;font-size:13px;">Correo</span><br>
+                                <strong style="color:#28a745;font-size:15px;">{email}</strong>
+                                </td>
+                            </tr>
+                            </table>
+                            <div style="background:#f9fff9;border-left:4px solid #28a745;padding:16px;border-radius:6px;">
+                            <p style="color:#444;font-size:15px;line-height:1.7;margin:0;">{mensaje}</p>
+                            </div>
+                            <hr style="border:none;border-top:1px solid #e8e8e8;margin:28px 0;">
+                            <p style="color:#aaa;font-size:12px;text-align:center;margin:0;">
+                            Este mensaje fue enviado desde el formulario de contacto de SenaFood.
+                            </p>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td style="background:#f9fff9;padding:18px 40px;text-align:center;border-top:1px solid #e8f5e9;">
+                            <p style="margin:0;color:#aaa;font-size:12px;">© 2026 SenaFood · Todos los derechos reservados</p>
+                        </td>
+                        </tr>
+                    </table>
+                    </td></tr>
+                    </table>
+                </body>
+                </html>
+                """
+                correo = EmailMultiAlternatives(
+                    subject=f'Contacto SenaFood — {asunto}',
+                    body=f'Nombre: {nombre}\nCorreo: {email}\n\nMensaje:\n{mensaje}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=['senafoodcdsf@gmail.com'],
+                    reply_to=[email],
+                )
+                correo.attach_alternative(html, "text/html")
+                correo.send(fail_silently=False)
+                enviado = True
+            except Exception as e:
+                error = 'Hubo un problema al enviar el mensaje. Intenta de nuevo.'
+        else:
+            error = 'Por favor completa todos los campos.'
+
+    return render(request, 'gestion/contacto.html', {
+        'enviado': enviado,
+        'error': error,
+    })
+

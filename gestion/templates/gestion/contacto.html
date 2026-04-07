@@ -1,0 +1,319 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenaFood - Contacto</title>
+    <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .contacto-wrapper {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .contacto-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 900px;
+            width: 100%;
+            border-top: 5px solid var(--sena-green);
+        }
+
+        /* --- Columna izquierda: formulario --- */
+        .contacto-form {
+            padding: 40px;
+        }
+
+        .contacto-form h2 {
+            color: var(--sena-dark);
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0 0 6px;
+        }
+
+        .contacto-form p.subtitulo {
+            color: #888;
+            font-size: 14px;
+            margin: 0 0 28px;
+        }
+
+        .contacto-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        .contacto-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .contacto-form input,
+        .contacto-form textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .contacto-form input:focus,
+        .contacto-form textarea:focus {
+            border-color: var(--sena-green);
+        }
+
+        .contacto-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contacto-form button {
+            width: 100%;
+            padding: 13px;
+            background: var(--sena-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .contacto-form button:hover {
+            background: var(--sena-dark);
+        }
+
+        /* --- Columna derecha: info --- */
+        .contacto-info {
+            background: linear-gradient(160deg, #28a745, #1a5c2a);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 28px;
+        }
+
+        .contacto-info h3 {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        .contacto-info p.info-sub {
+            color: #c8f7d0;
+            font-size: 13px;
+            margin: 0 0 24px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .info-item .icon-box {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-item .icon-box i {
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .info-item .info-text span {
+            display: block;
+            color: #c8f7d0;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item .info-text p {
+            color: #ffffff;
+            font-size: 14px;
+            margin: 4px 0 0;
+            line-height: 1.5;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .social-links a {
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .social-links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* --- Mensajes --- */
+        .msg-exito {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .msg-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 700px) {
+            .contacto-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="auth-body public-page-body">
+
+    {% include 'gestion/navbar_publico.html' %}
+
+    <div class="contacto-wrapper">
+        <div class="contacto-card">
+
+            <!-- Formulario -->
+            <div class="contacto-form">
+                <h2>Contáctanos</h2>
+                <p class="subtitulo">Escríbenos y te responderemos a la brevedad.</p>
+
+                {% if enviado %}
+                    <div class="msg-exito">
+                        <i class="fas fa-check-circle"></i>
+                        ¡Mensaje enviado! Te responderemos pronto.
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="msg-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                {% if not enviado %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Nombre completo</label>
+                        <input type="text" name="nombre" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="email" placeholder="tuemail@ejemplo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Asunto</label>
+                        <input type="text" name="asunto" placeholder="¿En qué podemos ayudarte?" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    </div>
+                    <button type="submit">
+                        <i class="fas fa-paper-plane"></i> Enviar mensaje
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Info de contacto -->
+            <div class="contacto-info">
+                <div>
+                    <h3>Información de contacto</h3>
+                    <p class="info-sub">Estamos aquí para ayudarte.</p>
+                </div>
+
+                <div class="info-item">
+                    <div class="icon-box"><i class="fas fa-envelope"></i></div>
+                    <div class="info-text">
+                        <span>Correo</span>
+                        <p>senafoodcdsf@gmail.com</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="icon-box"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-text">
+                        <span>Dirección</span>
+                        <p>Carrera 13 # 65-10<br>La cafetería está en el 3er piso</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="icon-box"><i class="fas fa-share-alt"></i></div>
+                    <div class="info-text">
+                        <span>Redes sociales</span>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/share/1CVWn9uh2K/" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://serviciosfinancierosena.blogspot.com/" target="_blank">
+                                <i class="fas fa-blog"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
