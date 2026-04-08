@@ -7,98 +7,170 @@
 
 {% block content %}
 <div id="catalogo-app">
-<div class="container-fluid mt-4 px-4">
-    <h4 class="page-title"><i class="fas fa-book me-2"></i>Catálogo de Productos</h4>
+    <div class="container-fluid mt-4 px-4">
 
-    {% if messages %}
-    <div style="margin-bottom:16px;">
-        {% for message in messages %}
-        <div style="background:{% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <h4 class="page-title mb-0"><i class="fas fa-book me-2"></i>Catálogo de Productos</h4>
+
+            {% if rol_usuario == 'Administrador' or rol_usuario == 'Cajero' %}
+            <form method="POST" action="{% url 'toggle_tienda' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'catalogo' %}">
+                {% if tienda_abierta %}
+                <button type="submit" style="background:#dc3545; color:white; border:none; padding:8px 20px;
+                    border-radius:20px; font-size:0.85rem; font-weight:700; cursor:pointer;
+                    display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-store-slash"></i> Cerrar tienda
+                </button>
+                {% else %}
+                <button type="submit" style="background:#28a745; color:white; border:none; padding:8px 20px;
+                    border-radius:20px; font-size:0.85rem; font-weight:700; cursor:pointer;
+                    display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-store"></i> Abrir tienda
+                </button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom:16px;">
+            {% for message in messages %}
+            <div style="background:{% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};
                     color:white; border-radius:8px; padding:10px 16px;
                     font-size:0.85rem; display:flex; align-items:center;
                     gap:8px; margin-bottom:8px;">
-            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
-            {{ message }}
+                <i
+                    class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <!-- Filtros -->
-    <form method="GET" action="">
-        <div class="filtros-wrapper">
-            <input type="text" name="buscar" class="search-input"
-                placeholder="🔍 Buscar producto..."
-                value="{{ filtro_buscar }}">
-            <select name="categoria" class="filtro-select">
-                <option value="">Todas las categorías</option>
-                {% for cat in categorias %}
-                <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn-filtrar">
-                <i class="fas fa-filter"></i> Filtrar
-            </button>
-            <a href="{% url 'catalogo' %}" class="btn-limpiar">
-                <i class="fas fa-times"></i> Limpiar
-            </a>
+        <!-- Filtros -->
+        <form method="GET" action="">
+            <div class="filtros-wrapper">
+                <input type="text" name="buscar" class="search-input" placeholder="🔍 Buscar producto..."
+                    value="{{ filtro_buscar }}">
+                <select name="categoria" class="filtro-select">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-filtrar">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <a href="{% url 'catalogo' %}" class="btn-limpiar">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+        </form>
+
+        <!-- Aviso tienda cerrada para clientes -->
+        {% if rol_usuario == 'Cliente' %}
+        <div id="aviso-tienda-cerrada" style="background:#fff3cd; color:#856404; border:1px solid #ffc107;
+            border-radius:10px; padding:14px 18px; margin-bottom:20px;
+            align-items:center; gap:10px; font-size:0.9rem;
+            display:{% if not tienda_abierta %}flex{% else %}none{% endif %};">
+            <i class="fas fa-store-slash" style="font-size:1.2rem;"></i>
+            <span>La tienda está cerrada en este momento. Puedes ver los productos pero no agregar al carrito.</span>
         </div>
-    </form>
+        {% endif %}
 
-    <!-- Grid -->
-    {% if productos %}
-    <div class="productos-grid">
-        {% for p in productos %}
-        <div class="producto-card">
+        <!-- Grid -->
+        {% if productos %}
+        <div class="productos-grid">
+            {% for p in productos %}
+            <div class="producto-card">
 
-            {% if p.imagen %}
-            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="producto-img">
-            {% else %}
-            <div class="producto-img-placeholder">🍽️</div>
-            {% endif %}
+                {% if p.imagen %}
+                <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="producto-img">
+                {% else %}
+                <div class="producto-img-placeholder">🍽️</div>
+                {% endif %}
 
-            <div class="producto-body">
-                <div class="producto-categoria">{{ p.categoria|default:"Sin categoría" }}</div>
-                <p class="producto-nombre">{{ p.nombre }}</p>
+                <div class="producto-body">
+                    <div class="producto-categoria">{{ p.categoria|default:"Sin categoría" }}</div>
+                    <p class="producto-nombre">{{ p.nombre }}</p>
 
-                <div style="font-size:0.78rem; color:#6c757d;">
-                    Stock disponible: <strong>{{ p.stock_actual }}</strong>
-                </div>
+                    <div style="font-size:0.78rem; color:#6c757d;">
+                        Stock disponible: <strong>{{ p.stock_actual }}</strong>
+                    </div>
 
-                <div class="producto-precio">
-                    {% if p.en_promocion %}
+                    <div class="producto-precio">
+                        {% if p.en_promocion %}
                         <span class="precio-promo">${{ p.precio_promocion|floatformat:0 }}</span>
                         <span class="precio-tachado">${{ p.precio_venta|floatformat:0 }}</span>
                         <span class="badge-promo"><i class="fas fa-tag"></i> Promo</span>
-                    {% else %}
+                        {% else %}
                         <span class="precio-normal">
                             ${{ p.precio_venta|floatformat:0|default:p.costo_unitario|floatformat:0 }}
                         </span>
+                        {% endif %}
+                    </div>
+
+                    {% if p.stock_actual > 0 %}
+                    {% if rol_usuario == 'Cliente' %}
+                    <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar btn-carrito-activo">
+                        <i class="fas fa-cart-plus"></i> Agregar al carrito
+                    </a>
+                    {% else %}
+                    <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar">
+                        <i class="fas fa-cart-plus"></i> Agregar al carrito
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <div class="btn-agregar" style="background:#6c757d; cursor:not-allowed;">
+                        <i class="fas fa-ban"></i> Sin stock
+                    </div>
                     {% endif %}
                 </div>
-
-                {% if p.stock_actual > 0 %}
-                <a href="{% url 'agregar_carrito' p.id_producto %}" class="btn-agregar"
-                    <i class="fas fa-cart-plus"></i> Agregar al carrito
-                </a>
-                {% else %}
-                <div class="btn-agregar" style="background:#6c757d; cursor:not-allowed;">
-                    <i class="fas fa-ban"></i> Sin stock
-                </div>
-                {% endif %}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-state">
-        <i class="fas fa-box-open"></i>
-        <p>No se encontraron productos disponibles.</p>
-        {% if filtro_buscar or filtro_categoria %}
-        <a href="{% url 'catalogo' %}" class="btn-limpiar">Ver todos los productos</a>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <p>No se encontraron productos disponibles.</p>
+            {% if filtro_buscar or filtro_categoria %}
+            <a href="{% url 'catalogo' %}" class="btn-limpiar">Ver todos los productos</a>
+            {% endif %}
+        </div>
         {% endif %}
+
     </div>
-    {% endif %}
 </div>
-</div>
+
+{% if rol_usuario == 'Cliente' %}
+<script>
+    function verificarTienda() {
+        fetch('/catalogo/tienda/estado/')
+            .then(r => r.json())
+            .then(data => {
+                const aviso = document.getElementById('aviso-tienda-cerrada');
+                if (aviso) aviso.style.display = data.tienda_abierta ? 'none' : 'flex';
+
+                document.querySelectorAll('.btn-carrito-activo').forEach(btn => {
+                    if (!data.tienda_abierta) {
+                        btn.style.background = '#6c757d';
+                        btn.style.cursor = 'not-allowed';
+                        btn.style.pointerEvents = 'none';
+                        btn.innerHTML = '<i class="fas fa-lock"></i> Tienda cerrada';
+                    } else {
+                        btn.style.background = '';
+                        btn.style.cursor = 'pointer';
+                        btn.style.pointerEvents = 'auto';
+                        btn.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
+                    }
+                });
+            })
+            .catch(err => console.warn('Error verificando tienda:', err));
+    }
+
+    verificarTienda();
+    setInterval(verificarTienda, 5000);
+</script>
+{% endif %}
 {% endblock %}

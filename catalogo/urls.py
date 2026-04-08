@@ -19,4 +19,5 @@ urlpatterns = [
     path('cajero/agregar/',            views.cajero_agregar_item, name='cajero_agregar_item'),
     path('cajero/buscar-cliente/',     views.buscar_cliente,      name='buscar_cliente'),
     path('cajero/crear-cliente/', views.cajero_crear_cliente_rapido, name='cajero_crear_cliente_rapido'),
+    path('tienda/estado/', views.estado_tienda_json, name='estado_tienda_json'),
 ]

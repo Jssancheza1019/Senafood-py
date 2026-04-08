@@ -38,6 +38,10 @@ def get_carrito_activo(usuario):
 # ─────────────────────────────────────────
 @sesion_requerida
 def catalogo_view(request):
+    from gestion.models import ConfiguracionTienda
+    config = ConfiguracionTienda.get()
+    tienda_abierta = bool(config.tienda_abierta)
+
     filtro_categoria = request.GET.get('categoria', '')
     filtro_buscar    = request.GET.get('buscar', '')
 
@@ -69,6 +73,7 @@ def catalogo_view(request):
         'n_items':           n_items,
         'nombre_usuario':    request.session.get('usuario_nombre', ''),
         'rol_usuario':       request.session.get('usuario_rol', ''),
+        'tienda_abierta':    tienda_abierta,
     })
 
 
@@ -78,6 +83,14 @@ def catalogo_view(request):
 @sesion_requerida
 def agregar_carrito(request, id_producto):
     from django.contrib import messages
+    from gestion.models import ConfiguracionTienda
+
+    # Verificar si la tienda está cerrada
+    config = ConfiguracionTienda.get()
+    if not bool(config.tienda_abierta) and request.session.get('usuario_rol') == 'Cliente':
+        messages.error(request, 'La tienda está cerrada. No puedes agregar productos al carrito.')
+        return redirect('catalogo')
+
     producto = get_object_or_404(Producto, pk=id_producto, estado='activo', es_activo=True)
     usuario  = get_usuario(request)
     carrito  = get_carrito_activo(usuario)
@@ -96,7 +109,6 @@ def agregar_carrito(request, id_producto):
     )
 
     if not creado:
-        # Verificar que no supere el stock disponible
         if detalle.cantidad >= (producto.stock or 0):
             messages.error(request, f'No hay más stock disponible de "{producto.nombre}". Stock máximo: {producto.stock}.')
             return redirect('catalogo')
@@ -571,3 +583,9 @@ def cajero_crear_cliente_rapido(request):
         'nombre': f'{cliente.nombre} {cliente.apellido}',
         'existia': False
     })
+
+@sesion_requerida
+def estado_tienda_json(request):
+    from gestion.models import ConfiguracionTienda
+    config = ConfiguracionTienda.get()
+    return JsonResponse({'tienda_abierta': bool(config.tienda_abierta)})

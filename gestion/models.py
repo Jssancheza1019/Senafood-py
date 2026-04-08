@@ -337,4 +337,16 @@ class TokenRestablecimiento(models.Model):
         diferencia = ahora - self.creado_en
         return not self.usado and diferencia.total_seconds() < 1800
 
+class ConfiguracionTienda(models.Model):
+    tienda_abierta = models.BooleanField(default=True)
+    actualizado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
+    update_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'configuracion_tienda'
+        verbose_name = 'Configuración de Tienda'
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1, defaults={'tienda_abierta': True})
+        return obj

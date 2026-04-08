@@ -8,6 +8,7 @@ from django.conf import settings
 import datetime
 from .models import TokenRestablecimiento
 from django.core.mail import EmailMultiAlternatives
+from .models import ConfiguracionTienda
 
 def bienvenida_view(request):
     if 'usuario_id' in request.session:
@@ -16,7 +17,11 @@ def bienvenida_view(request):
 
 def login_view(request):
     error_mensaje = None
-    email_ingresado = "" 
+    email_ingresado = ""
+
+    # Si ya tiene sesión activa, redirigir al dashboard
+    if 'usuario_id' in request.session:
+        return redirect('dashboard')
 
     if request.method == 'POST':
         email_ingresado = request.POST.get('email')
@@ -25,20 +30,26 @@ def login_view(request):
         try:
             usuario = Usuario.objects.get(email=email_ingresado)
             if check_password(password_ingresada, usuario.password):
-                # Guardamos ID y Nombre para usarlos en todo el sistema
+                request.session.flush()
                 request.session['usuario_id'] = usuario.id_usuario
                 request.session['usuario_nombre'] = usuario.nombre
                 request.session['usuario_rol'] = usuario.rol.nombre_rol
-                return redirect('dashboard')
+                response = redirect('dashboard')
+                response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+                response['Pragma'] = 'no-cache'
+                return response
             else:
                 error_mensaje = "Contraseña incorrecta."
         except Usuario.DoesNotExist:
             error_mensaje = "El correo no está registrado."
 
-    return render(request, 'gestion/login.html', {
-        'error': error_mensaje, 
+    response = render(request, 'gestion/login.html', {
+        'error': error_mensaje,
         'email_previo': email_ingresado
     })
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    return response
 
 
 def registro_view(request):
@@ -465,5 +476,18 @@ def contacto_view(request):
         'error': error,
     })
 
+def toggle_tienda_view(request):
+    rol = request.session.get('usuario_rol', '')
+    if rol not in ['Administrador', 'Cajero']:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        config = ConfiguracionTienda.get()
+        config.tienda_abierta = not config.tienda_abierta
+        usuario = Usuario.objects.get(id_usuario=request.session['usuario_id'])
+        config.actualizado_por = usuario
+        config.save()
+
+    return redirect('catalogo')
     
 

@@ -12,4 +12,5 @@ urlpatterns = [
     path('solicitar-reset/', views.solicitar_reset_view, name='solicitar_reset'),
     path('restablecer-password/<uuid:token>/', views.restablecer_password_view, name='restablecer_password'),
     path('contacto/', views.contacto_view, name='contacto'),
+    path('tienda/toggle/', views.toggle_tienda_view, name='toggle_tienda'),
 ]
