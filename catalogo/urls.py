@@ -15,4 +15,8 @@ urlpatterns = [
     path('pedidos/entregar/<int:id_carrito>/',     views.confirmar_entrega,   name='confirmar_entrega'),
     path('pedidos/json/', views.pedidos_json, name='pedidos_json'),
     path('pedidos/cobrar/<int:id_carrito>/', views.cobrar_pedido, name='cobrar_pedido'),
+    path('cajero/',                    views.vista_cajero,       name='vista_cajero'),
+    path('cajero/agregar/',            views.cajero_agregar_item, name='cajero_agregar_item'),
+    path('cajero/buscar-cliente/',     views.buscar_cliente,      name='buscar_cliente'),
+    path('cajero/crear-cliente/', views.cajero_crear_cliente_rapido, name='cajero_crear_cliente_rapido'),
 ]

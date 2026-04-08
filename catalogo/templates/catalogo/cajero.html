@@ -1,0 +1,409 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+    <div class="container-fluid mt-4 px-4">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+            <h4 class="page-title mb-0"><i class="fas fa-cash-register me-2"></i>Panel Cajero</h4>
+            <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:#6c757d;">
+                <span id="indicador"
+                    style="width:8px; height:8px; border-radius:50%; background:#28a745; display:inline-block;"></span>
+                Actualizando automáticamente
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+
+            <!-- PEDIDOS PENDIENTES POR PAGAR -->
+            <div class="carrito-card">
+                <h5 style="color:#28a745; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Pendientes de pago
+                    <span id="badge-caja"
+                        style="background:#dc3545; color:white; border-radius:20px; padding:2px 10px; font-size:0.75rem; margin-left:4px;">
+                        {{ pedidos_pago|length }}
+                    </span>
+                </h5>
+                <div id="lista-caja">
+                    <div style="text-align:center; padding:32px; color:#6c757d;">
+                        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CREAR PEDIDO DESDE CAJA -->
+            <div class="carrito-card">
+                <h5 style="color:#e0ac23; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-plus-circle"></i> Nuevo pedido desde caja
+                </h5>
+
+                <!-- Buscar o crear cliente -->
+                <div style="margin-bottom:14px; position:relative;">
+                    <input type="text" id="buscar-cliente" placeholder="Buscar cliente por nombre o email..."
+                        style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:13px; box-sizing:border-box;">
+                    <div id="sugerencias-cliente"
+                        style="position:absolute; top:100%; left:0; right:0; background:white;
+                               border:1px solid #ddd; border-radius:8px; z-index:100; display:none;
+                               box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                    </div>
+                </div>
+
+                <!-- Botón cliente rápido -->
+                <div id="btn-crear-cliente-wrap" style="margin-bottom:14px;">
+                    <button onclick="mostrarFormClienteRapido()"
+                        style="background:none; border:1px dashed #e0ac23; color:#e0ac23; padding:8px 14px;
+                               border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; width:100%;">
+                        <i class="fas fa-user-plus"></i> Cliente no registrado — crear rápido
+                    </button>
+                </div>
+
+                <!-- Formulario cliente rápido -->
+                <div id="form-cliente-rapido"
+                    style="display:none; background:#fffbf0; border:1px solid #e0ac23;
+                           border-radius:8px; padding:14px; margin-bottom:14px;">
+                    <p style="font-size:12px; color:#888; margin:0 0 10px;">Solo nombre completo y cédula:</p>
+                    <input type="text" id="nuevo-nombre" placeholder="Nombre completo"
+                        style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px;
+                               font-size:13px; box-sizing:border-box; margin-bottom:8px;">
+                    <input type="text" id="nueva-cedula" placeholder="Número de cédula"
+                        style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px;
+                               font-size:13px; box-sizing:border-box; margin-bottom:10px;">
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="crearClienteRapido()"
+                            style="flex:1; background:#e0ac23; color:white; border:none; padding:9px;
+                                   border-radius:6px; font-size:13px; font-weight:700; cursor:pointer;">
+                            <i class="fas fa-check"></i> Registrar y seleccionar
+                        </button>
+                        <button onclick="ocultarFormClienteRapido()"
+                            style="background:#f0f0f0; color:#666; border:none; padding:9px 14px;
+                                   border-radius:6px; font-size:13px; cursor:pointer;">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cliente seleccionado -->
+                <div id="cliente-seleccionado"
+                    style="display:none; background:#f0fff4; border:1px solid #c3e6cb;
+                           border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:13px; color:#155724;">
+                    <i class="fas fa-user-check"></i> <span id="nombre-cliente"></span>
+                    <button onclick="limpiarCliente()"
+                        style="float:right; background:none; border:none; color:#dc3545; cursor:pointer; font-size:13px;">✕</button>
+                </div>
+
+                <!-- Buscar producto -->
+                <div style="margin-bottom:14px;">
+                    <input type="text" id="buscar-producto" placeholder="Buscar producto..."
+                        style="width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:13px; box-sizing:border-box;">
+                </div>
+
+                <!-- Lista productos -->
+                <div id="lista-productos"
+                    style="max-height:200px; overflow-y:auto; margin-bottom:14px; border:1px solid #eee; border-radius:8px;">
+                    {% for p in productos %}
+                    {% if p.precio_venta %}
+                    <div class="producto-item"
+                        data-id="{{ p.id_producto }}"
+                        data-nombre="{{ p.nombre }}"
+                        data-precio="{{ p.precio_venta }}"
+                        style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px;
+                               border-bottom:1px solid #f0f0f0; cursor:pointer; transition:background 0.2s;">
+                        <span style="font-size:13px; font-weight:600; color:#333;">{{ p.nombre }}</span>
+                        <span style="font-size:13px; color:#28a745; font-weight:700;">${{ p.precio_venta|floatformat:0 }}</span>
+                    </div>
+                    {% else %}
+                    <div class="producto-item"
+                        data-id="{{ p.id_producto }}"
+                        data-nombre="{{ p.nombre }}"
+                        data-precio="{{ p.costo_unitario }}"
+                        style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px;
+                               border-bottom:1px solid #f0f0f0; cursor:pointer; transition:background 0.2s;">
+                        <span style="font-size:13px; font-weight:600; color:#333;">{{ p.nombre }}</span>
+                        <span style="font-size:13px; color:#28a745; font-weight:700;">${{ p.costo_unitario|floatformat:0 }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Items del pedido -->
+                <div id="items-pedido" style="margin-bottom:14px;"></div>
+                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1rem;
+                            margin-bottom:14px; padding:10px; background:#f9fff9; border-radius:8px;">
+                    <span>Total:</span>
+                    <span id="total-pedido" style="color:#28a745;">$0</span>
+                </div>
+
+                <button onclick="crearPedidoCaja()"
+                    style="background:#e0ac23; color:white; border:none; padding:10px 20px;
+                           border-radius:20px; font-size:0.9rem; font-weight:700; cursor:pointer;
+                           width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fas fa-receipt"></i> Crear pedido y cobrar
+                </button>
+            </div>
+        </div>
+
+        <!-- HISTORIAL DEL DÍA -->
+        <div class="carrito-card">
+            <h5 style="color:#6c757d; font-weight:700; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+                <span><i class="fas fa-history me-2"></i>Historial de pagos hoy</span>
+                <span style="background:#28a745; color:white; border-radius:20px; padding:4px 16px; font-size:0.85rem;">
+                    Total del día: ${{ total_dia|floatformat:0 }}
+                </span>
+            </h5>
+            {% if not historial_hoy %}
+            <div style="text-align:center; padding:24px; color:#6c757d;">
+                <i class="fas fa-receipt" style="font-size:2rem; color:#ddd; display:block; margin-bottom:8px;"></i>
+                No hay pagos registrados hoy
+            </div>
+            {% else %}
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:#f8f9fa; border-bottom:2px solid #dee2e6;">
+                            <th style="padding:10px 14px; text-align:left; color:#555;">#</th>
+                            <th style="padding:10px 14px; text-align:left; color:#555;">Cliente</th>
+                            <th style="padding:10px 14px; text-align:left; color:#555;">Hora</th>
+                            <th style="padding:10px 14px; text-align:left; color:#555;">Estado</th>
+                            <th style="padding:10px 14px; text-align:right; color:#555;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in historial_hoy %}
+                        <tr style="border-bottom:1px solid #f0f0f0;">
+                            <td style="padding:10px 14px; color:#6c757d;">#{{ c.id_carrito }}</td>
+                            <td style="padding:10px 14px; font-weight:600;">
+                                {{ c.usuario.nombre }}{% if c.usuario.apellido %} {{ c.usuario.apellido }}{% endif %}
+                            </td>
+                            <td style="padding:10px 14px; color:#6c757d;">{{ c.fecha_confirmacion|date:"H:i" }}</td>
+                            <td style="padding:10px 14px;">
+                                {% if c.estado == 'entregado' %}
+                                <span style="background:#d4edda; color:#155724; padding:3px 10px; border-radius:20px; font-size:12px;">Entregado</span>
+                                {% else %}
+                                <span style="background:#d1ecf1; color:#0c5460; padding:3px 10px; border-radius:20px; font-size:12px;">Pendiente entrega</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:10px 14px; text-align:right; font-weight:700; color:#28a745;">${{ c.total|floatformat:0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let itemsPedido = {};
+    let clienteId = null;
+
+    document.getElementById('buscar-cliente').addEventListener('input', function () {
+        const q = this.value.trim();
+        if (q.length < 2) { document.getElementById('sugerencias-cliente').style.display = 'none'; return; }
+        fetch(`/catalogo/cajero/buscar-cliente/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+                const box = document.getElementById('sugerencias-cliente');
+                if (!data.clientes.length) { box.style.display = 'none'; return; }
+                box.innerHTML = data.clientes.map(c =>
+                    `<div onclick="seleccionarCliente(${c.id}, '${c.nombre}')"
+                        style="padding:10px 14px; cursor:pointer; font-size:13px; border-bottom:1px solid #f0f0f0;"
+                        onmouseover="this.style.background='#f0fff4'" onmouseout="this.style.background='white'">
+                        <strong>${c.nombre}</strong> <span style="color:#6c757d;">${c.email}</span>
+                    </div>`
+                ).join('');
+                box.style.display = 'block';
+            });
+    });
+
+    function seleccionarCliente(id, nombre) {
+        clienteId = id;
+        document.getElementById('nombre-cliente').textContent = nombre;
+        document.getElementById('cliente-seleccionado').style.display = 'block';
+        document.getElementById('buscar-cliente').style.display = 'none';
+        document.getElementById('sugerencias-cliente').style.display = 'none';
+        document.getElementById('btn-crear-cliente-wrap').style.display = 'none';
+    }
+
+    function limpiarCliente() {
+        clienteId = null;
+        document.getElementById('cliente-seleccionado').style.display = 'none';
+        document.getElementById('buscar-cliente').style.display = 'block';
+        document.getElementById('buscar-cliente').value = '';
+        document.getElementById('btn-crear-cliente-wrap').style.display = 'block';
+    }
+
+    function mostrarFormClienteRapido() {
+        document.getElementById('form-cliente-rapido').style.display = 'block';
+        document.getElementById('btn-crear-cliente-wrap').style.display = 'none';
+        document.getElementById('buscar-cliente').style.display = 'none';
+        document.getElementById('sugerencias-cliente').style.display = 'none';
+    }
+
+    function ocultarFormClienteRapido() {
+        document.getElementById('form-cliente-rapido').style.display = 'none';
+        document.getElementById('btn-crear-cliente-wrap').style.display = 'block';
+        document.getElementById('buscar-cliente').style.display = 'block';
+    }
+
+    function crearClienteRapido() {
+        const nombre = document.getElementById('nuevo-nombre').value.trim();
+        const cedula = document.getElementById('nueva-cedula').value.trim();
+        if (!nombre || !cedula) { alert('Ingresa el nombre y la cédula.'); return; }
+        fetch('/catalogo/cajero/crear-cliente/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify({ nombre, cedula }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                seleccionarCliente(data.id, data.nombre);
+                document.getElementById('form-cliente-rapido').style.display = 'none';
+                if (data.existia) alert(`Cliente ya registrado: ${data.nombre}`);
+            } else {
+                alert('Error: ' + (data.error || 'desconocido'));
+            }
+        });
+    }
+
+    document.getElementById('buscar-producto').addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.producto-item').forEach(item => {
+            item.style.display = item.dataset.nombre.toLowerCase().includes(q) ? 'flex' : 'none';
+        });
+    });
+
+    document.querySelectorAll('.producto-item').forEach(item => {
+        item.addEventListener('click', function () {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            const precio = parseFloat(this.dataset.precio) || 0;
+            if (itemsPedido[id]) { itemsPedido[id].cantidad += 1; }
+            else { itemsPedido[id] = { nombre, precio, cantidad: 1 }; }
+            renderItemsPedido();
+        });
+    });
+
+    function renderItemsPedido() {
+        const container = document.getElementById('items-pedido');
+        let total = 0;
+        const html = Object.entries(itemsPedido).map(([id, item]) => {
+            const sub = item.precio * item.cantidad;
+            total += sub;
+            return `
+            <div style="display:flex; justify-content:space-between; align-items:center;
+                        padding:8px 12px; background:#f9f9f9; border-radius:8px; margin-bottom:6px; font-size:13px;">
+                <span style="font-weight:600;">${item.nombre}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button onclick="cambiarCantidad('${id}', -1)"
+                        style="width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:white; cursor:pointer; font-weight:700;">−</button>
+                    <span>${item.cantidad}</span>
+                    <button onclick="cambiarCantidad('${id}', 1)"
+                        style="width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:white; cursor:pointer; font-weight:700;">+</button>
+                    <span style="color:#28a745; font-weight:700; min-width:70px; text-align:right;">$${sub.toLocaleString()}</span>
+                    <button onclick="eliminarItem('${id}')" style="background:none; border:none; color:#dc3545; cursor:pointer; font-size:15px;">✕</button>
+                </div>
+            </div>`;
+        }).join('');
+        container.innerHTML = html;
+        document.getElementById('total-pedido').textContent = '$' + total.toLocaleString();
+    }
+
+    function cambiarCantidad(id, delta) {
+        if (!itemsPedido[id]) return;
+        itemsPedido[id].cantidad += delta;
+        if (itemsPedido[id].cantidad <= 0) delete itemsPedido[id];
+        renderItemsPedido();
+    }
+
+    function eliminarItem(id) { delete itemsPedido[id]; renderItemsPedido(); }
+
+    function crearPedidoCaja() {
+        if (!clienteId) { alert('Selecciona un cliente primero.'); return; }
+        if (!Object.keys(itemsPedido).length) { alert('Agrega al menos un producto.'); return; }
+        const items = Object.entries(itemsPedido).map(([id, item]) => ({ id: parseInt(id), cantidad: item.cantidad }));
+        fetch('/catalogo/cajero/agregar/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify({ usuario_id: clienteId, items }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) { window.location.href = `/catalogo/pedidos/cobrar/${data.carrito_id}/`; }
+            else { alert('Error al crear el pedido: ' + (data.error || 'desconocido')); }
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function actualizarListaCaja() {
+        fetch('/catalogo/pedidos/json/')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('badge-caja').textContent = data.pedidos_caja.length;
+                document.getElementById('indicador').style.background = '#28a745';
+                const listaCaja = document.getElementById('lista-caja');
+                if (data.pedidos_caja.length === 0) {
+                    listaCaja.innerHTML = `
+                        <div style="text-align:center; padding:32px; color:#6c757d;">
+                            <i class="fas fa-check-circle" style="font-size:2rem; color:#a8d5b5; display:block; margin-bottom:8px;"></i>
+                            No hay pedidos pendientes de pago
+                        </div>`;
+                } else {
+                    listaCaja.innerHTML = data.pedidos_caja.map(p => {
+                        const detalles = p.detalles.map(d =>
+                            `<div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#555; padding:3px 0;">
+                                <span>${d.nombre} x${d.cantidad}</span>
+                                <span>$${d.subtotal.toLocaleString()}</span>
+                            </div>`
+                        ).join('');
+                        return `
+                        <div style="border:1px solid #d4edda; border-radius:10px; padding:16px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <div>
+                                    <span style="font-weight:700; color:#2e3b33;">Pedido #${p.id}</span>
+                                    <span style="color:#6c757d; font-size:0.82rem; margin-left:8px;">${p.cliente}</span>
+                                </div>
+                                <span style="color:#28a745; font-weight:700; font-size:1.1rem;">$${p.total.toLocaleString()}</span>
+                            </div>
+                            ${detalles}
+                            <a href="/catalogo/pedidos/cobrar/${p.id}/"
+                                style="background:#28a745; color:white; border:none; padding:8px 20px;
+                                    border-radius:20px; font-size:0.85rem; font-weight:600; cursor:pointer;
+                                    width:100%; display:flex; align-items:center; justify-content:center;
+                                    gap:6px; text-decoration:none; margin-top:12px; box-sizing:border-box;">
+                                <i class="fas fa-money-bill-wave"></i> Cobrar pedido
+                            </a>
+                        </div>`;
+                    }).join('');
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        actualizarListaCaja();
+        setInterval(actualizarListaCaja, 5000);
+    });
+</script>
+{% endblock %}

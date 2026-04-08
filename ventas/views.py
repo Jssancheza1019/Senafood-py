@@ -34,7 +34,6 @@ def sesion_requerida_admin(view_func):
 # ─────────────────────────────────────────
 # LISTA VENTAS
 # ─────────────────────────────────────────
-@sesion_requerida_admin
 def lista_ventas(request):
     from django.db.models import Q
 
@@ -42,15 +41,17 @@ def lista_ventas(request):
     filtro_fecha_fin    = request.GET.get('fecha_fin', '')
     filtro_cliente      = request.GET.get('cliente', '')
 
-    ahora         = datetime.utcnow() - timedelta(hours=5)
-    hoy           = ahora.date()
-    semana        = hoy - timedelta(days=7)
-    mes           = hoy.replace(day=1)
+    ahora        = datetime.utcnow() - timedelta(hours=5)
+    hoy          = ahora.date()
+    mes          = hoy.replace(day=1)
 
-    hoy_inicio    = datetime.combine(hoy,    datetime.min.time())
-    hoy_fin       = datetime.combine(hoy,    datetime.max.time())
-    semana_inicio = datetime.combine(semana, datetime.min.time())
-    mes_inicio    = datetime.combine(mes,    datetime.min.time())
+    hoy_inicio   = datetime.combine(hoy, datetime.min.time())
+    hoy_fin      = datetime.combine(hoy, datetime.max.time())
+    mes_inicio   = datetime.combine(mes, datetime.min.time())
+
+    # Semana en curso desde el lunes
+    lunes_semana        = hoy - timedelta(days=hoy.weekday())
+    lunes_semana_inicio = datetime.combine(lunes_semana, datetime.min.time())
 
     # ── Totales ──
     total_hoy = Carrito.objects.filter(estado='entregado').filter(
@@ -59,8 +60,8 @@ def lista_ventas(request):
     ).aggregate(t=Sum('total'))['t'] or 0
 
     total_semana = Carrito.objects.filter(estado='entregado').filter(
-        Q(fecha_entrega__gte=semana_inicio) |
-        Q(fecha_entrega__isnull=True, update_at__gte=semana_inicio)
+        Q(fecha_entrega__gte=lunes_semana_inicio) |
+        Q(fecha_entrega__isnull=True, update_at__gte=lunes_semana_inicio)
     ).aggregate(t=Sum('total'))['t'] or 0
 
     total_mes = Carrito.objects.filter(estado='entregado').filter(
@@ -120,20 +121,28 @@ def lista_ventas(request):
         ]
         tiempo_promedio = round(sum(tiempos) / len(tiempos), 1)
 
-    # ── Gráfica días de la semana (últimos 7 días) ──
-    dias_semana    = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    ventas_por_dia = [0] * 7
+    # ── Gráfica semana en curso (lunes a domingo) ──
+    dias_es        = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+    dias_semana    = []
+    ventas_por_dia = []
 
-    hace_7_dias = datetime.combine(semana, datetime.min.time())
+    for i in range(7):
+        dia = lunes_semana + timedelta(days=i)
+        dias_semana.append(f"{dias_es[dia.weekday()]} {dia.strftime('%d')}")
 
-    for c in Carrito.objects.filter(estado='entregado').filter(
-        Q(fecha_entrega__gte=hace_7_dias) |
-        Q(fecha_entrega__isnull=True, update_at__gte=hace_7_dias)
-    ):
-        fecha = c.fecha_entrega or c.update_at
-        if fecha:
-            dia = fecha.weekday()
-            ventas_por_dia[dia] += float(c.total or 0)
+        if dia > hoy:
+            ventas_por_dia.append(0)
+            continue
+
+        dia_inicio = datetime.combine(dia, datetime.min.time())
+        dia_fin    = datetime.combine(dia, datetime.max.time())
+
+        total = Carrito.objects.filter(estado='entregado').filter(
+            Q(fecha_entrega__gte=dia_inicio, fecha_entrega__lte=dia_fin) |
+            Q(fecha_entrega__isnull=True, update_at__gte=dia_inicio, update_at__lte=dia_fin)
+        ).aggregate(t=Sum('total'))['t'] or 0
+
+        ventas_por_dia.append(float(total))
 
     # ── Gráfica categorías ──
     ventas_categoria = Detallecarrito.objects.filter(
@@ -184,8 +193,6 @@ def lista_ventas(request):
         'rol_usuario':         request.session.get('usuario_rol', ''),
     }
     return render(request, 'ventas/lista.html', context)
-
-
 # ─────────────────────────────────────────
 # DETALLE VENTA
 # ─────────────────────────────────────────
