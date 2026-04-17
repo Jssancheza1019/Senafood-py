@@ -1,0 +1,73 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+<div style="max-width:480px; margin:40px auto; padding:0 20px;">
+
+    <div class="carrito-card" style="text-align:center;">
+
+        <div style="background:linear-gradient(135deg, #e40046, #ff4d7d);
+                    border-radius:12px; padding:24px; margin-bottom:24px;">
+            <div style="color:white; font-size:1.1rem; font-weight:700; margin-bottom:8px;">
+                💳 Pago con Daviplata
+            </div>
+            <div style="color:#ffc8d8; font-size:0.85rem; margin-bottom:12px;">
+                Transfiere al número
+            </div>
+            <div style="color:white; font-size:1.8rem; font-weight:800; letter-spacing:3px;">
+                310 899 5990
+            </div>
+            <div style="margin-top:14px; color:#fff; font-size:1.4rem; font-weight:800;">
+                ${{ valor|floatformat:0 }}
+            </div>
+            <div style="color:#ffc8d8; font-size:0.78rem; margin-top:4px;">
+                Valor exacto del pedido #{{ carrito.id_carrito }}
+            </div>
+        </div>
+
+        <!-- Instrucciones -->
+        <div style="background:#fff5f7; border-radius:10px; padding:16px;
+                    margin-bottom:20px; text-align:left;">
+            <p style="font-size:0.85rem; font-weight:700; color:#e40046; margin:0 0 10px;">
+                <i class="fas fa-info-circle"></i> Pasos para pagar:
+            </p>
+            <ol style="font-size:0.82rem; color:#555; margin:0; padding-left:18px; line-height:2;">
+                <li>Abre tu app <strong>Daviplata</strong></li>
+                <li>Ve a <strong>Transferir</strong></li>
+                <li>Ingresa el número <strong>310 899 5990</strong></li>
+                <li>Ingresa el valor <strong>${{ valor|floatformat:0 }}</strong></li>
+                <li>Confirma el pago</li>
+            </ol>
+        </div>
+
+        <p style="font-size:0.82rem; color:#6c757d; margin-bottom:24px;">
+            Cuando completes el pago presiona el botón para confirmar tu pedido.
+        </p>
+
+        <!-- Botón confirmar -->
+        <form method="POST" action="{% url 'confirmar_pago_daviplata' carrito.id_carrito %}">
+            {% csrf_token %}
+            <button type="submit"
+                style="background:#e40046; color:white; border:none; padding:14px;
+                    border-radius:20px; font-size:1rem; font-weight:600;
+                    cursor:pointer; width:100%; display:flex; align-items:center;
+                    justify-content:center; gap:8px; box-sizing:border-box;">
+                <i class="fas fa-check-circle"></i> Ya pagué — Confirmar pedido
+            </button>
+        </form>
+
+        <a href="{% url 'ver_carrito' %}"
+        style="display:block; margin-top:14px; font-size:0.85rem;
+                color:#6c757d; text-decoration:none;">
+            ← Volver al carrito
+        </a>
+    </div>
+
+</div>
+</div>
+{% endblock %}

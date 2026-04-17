@@ -1,0 +1,118 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+<div class="container-fluid mt-4 px-4">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+        <a href="{% url 'vista_vendedor' %}" style="color:#28a745; font-size:1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h4 class="page-title mb-0">
+            <i class="fas fa-mobile-alt me-2"></i>Cobrar con Nequi — Pedido #{{ carrito.id_carrito }}
+        </h4>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 400px; gap:24px; align-items:start;">
+
+        <!-- Detalle del pedido -->
+        <div class="carrito-card">
+            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
+                <i class="fas fa-receipt me-2" style="color:#28a745;"></i>
+                Detalle del pedido
+            </h5>
+
+            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0fff4;">
+                <span style="color:#6c757d; font-size:0.85rem;">Cliente:</span>
+                <span style="font-weight:600; margin-left:8px;">
+                    {{ carrito.usuario.nombre }} {{ carrito.usuario.apellido }}
+                </span>
+            </div>
+
+            {% for d in detalles %}
+            <div class="carrito-item">
+                {% if d.id_producto.imagen %}
+                <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
+                {% else %}
+                <div class="carrito-img-placeholder">🍽️</div>
+                {% endif %}
+
+                <div class="carrito-info">
+                    <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
+                    <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
+                </div>
+
+                <div style="text-align:center; min-width:40px;">
+                    <span style="font-weight:600;">x{{ d.cantidad }}</span>
+                </div>
+
+                <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
+            </div>
+            {% endfor %}
+
+            <div class="total-box" style="margin-top:16px;">
+                <span class="total-label">Total a cobrar</span>
+                <span class="total-valor">${{ carrito.total|floatformat:0 }}</span>
+            </div>
+        </div>
+
+        <!-- Panel Nequi -->
+        <div class="carrito-card" style="text-align:center;">
+            <div style="background:linear-gradient(135deg, #2d1b69, #4a2d8f);
+                        border-radius:12px; padding:24px; margin-bottom:20px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Nequi_logo.svg/320px-Nequi_logo.svg.png"
+                    alt="Nequi" style="height:40px; margin-bottom:16px; filter:brightness(0) invert(1);">
+                <div style="color:white; font-size:0.85rem; margin-bottom:8px; opacity:0.8;">
+                    Escanea el QR o transfiere al número
+                </div>
+                <div style="color:#a78bfa; font-size:1.6rem; font-weight:800; letter-spacing:2px;">
+                    310 899 5990
+                </div>
+                <div style="color:white; font-size:1rem; margin-top:12px; opacity:0.9;">
+                    Valor exacto:
+                    <span style="color:#4ade80; font-weight:800; font-size:1.3rem;">
+                        ${{ carrito.total|floatformat:0 }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- QR -->
+            <div style="background:white; border-radius:12px; padding:16px;
+                        display:inline-block; box-shadow:0 2px 12px rgba(0,0,0,0.1);
+                        margin-bottom:20px;">
+                <img src="data:image/png;base64,{{ qr_base64 }}"
+                    alt="QR Nequi" style="width:200px; height:200px;">
+            </div>
+
+            <p style="font-size:0.82rem; color:#6c757d; margin-bottom:20px;">
+                El QR lleva al cliente directo a pagar <strong>${{ carrito.total|floatformat:0 }}</strong> en Nequi
+            </p>
+
+            <!-- Botón confirmar pago -->
+            <form method="POST" action="{% url 'registrar_pago' carrito.id_carrito %}">
+                {% csrf_token %}
+                <button type="submit"
+                    style="background:#2d1b69; color:white; border:none; padding:14px;
+                        border-radius:20px; font-size:1rem; font-weight:600;
+                        cursor:pointer; width:100%; display:flex; align-items:center;
+                        justify-content:center; gap:8px; transition:background 0.2s;">
+                    <i class="fas fa-check-circle"></i> Confirmar pago recibido
+                </button>
+            </form>
+
+            <a href="{% url 'cobrar_pedido' carrito.id_carrito %}"
+            style="display:block; margin-top:12px; font-size:0.85rem;
+                    color:#6c757d; text-decoration:none;">
+                ← Volver a pago en efectivo
+            </a>
+        </div>
+
+    </div>
+</div>
+</div>
+{% endblock %}

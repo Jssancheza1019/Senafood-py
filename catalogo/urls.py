@@ -20,4 +20,13 @@ urlpatterns = [
     path('cajero/buscar-cliente/',     views.buscar_cliente,      name='buscar_cliente'),
     path('cajero/crear-cliente/', views.cajero_crear_cliente_rapido, name='cajero_crear_cliente_rapido'),
     path('tienda/estado/', views.estado_tienda_json, name='estado_tienda_json'),
+    path('pedidos/cobrar-nequi/<int:id_carrito>/', views.cobrar_nequi, name='cobrar_nequi'),
+    path('pago/nequi/<int:id_carrito>/',          views.pago_nequi_cliente,   name='pago_nequi_cliente'),
+    path('pago/nequi/confirmar/<int:id_carrito>/', views.confirmar_pago_nequi, name='confirmar_pago_nequi'),
+    path('pago/daviplata/<int:id_carrito>/',          views.pago_daviplata_cliente,   name='pago_daviplata_cliente'),
+    path('pago/daviplata/confirmar/<int:id_carrito>/', views.confirmar_pago_daviplata, name='confirmar_pago_daviplata'),
+    path('historial/', views.historial_cliente, name='historial_cliente'),
+    path('calificar/<int:id_carrito>/', views.calificar_pedido, name='calificar_pedido'),
+    path('calificar/guardar/<int:id_carrito>/', views.guardar_calificacion, name='guardar_calificacion'),
+    path('pedido/<int:id_carrito>/', views.detalle_pedido, name='detalle_pedido'),
 ]

@@ -7,102 +7,132 @@
 
 {% block content %}
 <div id="catalogo-app">
-<div class="container-fluid mt-4 px-4">
+    <div class="container-fluid mt-4 px-4">
 
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
-        <a href="{% url 'catalogo' %}" style="color:#28a745; font-size:1.2rem;">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h4 class="page-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Mi Carrito</h4>
-    </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+            <a href="{% url 'catalogo' %}" style="color:#28a745; font-size:1.2rem;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="page-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Mi Carrito</h4>
+        </div>
 
-    {% if messages %}
-    <div style="margin-bottom:16px;">
-        {% for message in messages %}
-        <div style="background:{% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};
+        {% if messages %}
+        <div style="margin-bottom:16px;">
+            {% for message in messages %}
+            <div style="background:{% if message.tags == 'success' %}#28a745{% else %}#dc3545{% endif %};
                     color:white; border-radius:8px; padding:10px 16px;
                     font-size:0.85rem; display:flex; align-items:center;
                     gap:8px; margin-bottom:8px;">
-            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    {% if detalles %}
-    <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
-
-        <!-- Items -->
-        <div class="carrito-card">
-            {% for d in detalles %}
-            <div class="carrito-item">
-                {% if d.id_producto.imagen %}
-                <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
-                {% else %}
-                <div class="carrito-img-placeholder">🍽️</div>
-                {% endif %}
-
-                <div class="carrito-info">
-                    <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
-                    <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
-                    <div style="font-size:0.75rem; color:#6c757d;">
-                        Stock disponible: {{ d.id_producto.stock_actual }}
-                    </div>
-                </div>
-
-                <form method="POST" action="{% url 'actualizar_cantidad' d.id_detalle %}">
-                    {% csrf_token %}
-                    <div class="cantidad-wrapper">
-                        <button type="submit" name="cantidad" value="{{ d.cantidad|add:'-1' }}" class="btn-cantidad">−</button>
-                        <span style="font-weight:600; min-width:24px; text-align:center;">{{ d.cantidad }}</span>
-                        <button type="submit" name="cantidad" value="{{ d.cantidad|add:'1' }}" class="btn-cantidad">+</button>
-                    </div>
-                </form>
-
-                <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
-
-                <form method="POST" action="{% url 'eliminar_detalle' d.id_detalle %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-eliminar" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </form>
+                <i
+                    class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
+                {{ message }}
             </div>
             {% endfor %}
         </div>
+        {% endif %}
 
-        <!-- Resumen -->
-        <div class="carrito-card">
-            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">Resumen del pedido</h5>
-            <div style="color:#6c757d; font-size:0.85rem; margin-bottom:8px;">
-                {{ detalles|length }} producto{{ detalles|length|pluralize }} en tu carrito
+        {% if detalles %}
+        <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
+
+            <!-- Items -->
+            <div class="carrito-card">
+                {% for d in detalles %}
+                <div class="carrito-item">
+                    {% if d.id_producto.imagen %}
+                    <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
+                    {% else %}
+                    <div class="carrito-img-placeholder">🍽️</div>
+                    {% endif %}
+
+                    <div class="carrito-info">
+                        <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
+                        <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
+                        <div style="font-size:0.75rem; color:#6c757d;">
+                            Stock disponible: {{ d.id_producto.stock_actual }}
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{% url 'actualizar_cantidad' d.id_detalle %}">
+                        {% csrf_token %}
+                        <div class="cantidad-wrapper">
+                            <button type="submit" name="cantidad" value="{{ d.cantidad|add:'-1' }}"
+                                class="btn-cantidad">−</button>
+                            <span style="font-weight:600; min-width:24px; text-align:center;">{{ d.cantidad }}</span>
+                            <button type="submit" name="cantidad" value="{{ d.cantidad|add:'1' }}"
+                                class="btn-cantidad">+</button>
+                        </div>
+                    </form>
+
+                    <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
+
+                    <form method="POST" action="{% url 'eliminar_detalle' d.id_detalle %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-eliminar" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
             </div>
-            <div class="total-box">
-                <span class="total-label">Total</span>
-                <span class="total-valor">${{ total|floatformat:0 }}</span>
+
+            <!-- Resumen -->
+            <div class="carrito-card">
+                <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">Resumen del pedido</h5>
+                <div style="color:#6c757d; font-size:0.85rem; margin-bottom:8px;">
+                    {{ detalles|length }} producto{{ detalles|length|pluralize }} en tu carrito
+                </div>
+                <div class="total-box">
+                    <span class="total-label">Total</span>
+                    <span class="total-valor">${{ total|floatformat:0 }}</span>
+                </div>
+
+                <p style="font-size:0.85rem; font-weight:600; color:#555; margin:16px 0 10px;">
+                    Elige tu método de pago:
+                </p>
+
+                <!-- Efectivo -->
+                <form method="POST" action="{% url 'confirmar_pedido' %}" style="margin-bottom:10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo_pago" value="efectivo">
+                    <button type="submit" class="btn-pagar" style="background:#28a745;">
+                        <i class="fas fa-money-bill-wave me-2"></i>Pagar en efectivo (caja)
+                    </button>
+                </form>
+
+                <!-- Nequi -->
+                <form method="POST" action="{% url 'confirmar_pedido' %}" style="margin-bottom:16px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo_pago" value="nequi">
+                    <button type="submit" class="btn-pagar" style="background:#2d1b69;">
+                        <i class="fas fa-mobile-alt me-2"></i>Pagar con Nequi
+                    </button>
+                </form>
+
+                <!-- Daviplata -->
+                <form method="POST" action="{% url 'confirmar_pedido' %}" style="margin-bottom:16px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo_pago" value="daviplata">
+                    <button type="submit" class="btn-pagar" style="background:#e40046;">
+                        <i class="fas fa-mobile-alt me-2"></i>Pagar con Daviplata
+                    </button>
+                </form>
+
+                <a href="{% url 'catalogo' %}" class="btn-seguir">
+                    <i class="fas fa-arrow-left me-1"></i>Seguir comprando
+                </a>
             </div>
-            <form method="POST" action="{% url 'confirmar_pedido' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn-pagar">
-                    <i class="fas fa-check-circle me-2"></i>Confirmar pedido
-                </button>
-            </form>
-            <a href="{% url 'catalogo' %}" class="btn-seguir">
-                <i class="fas fa-arrow-left me-1"></i>Seguir comprando
+
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:60px 20px; color:#6c757d;">
+            <i class="fas fa-shopping-cart"
+                style="font-size:3rem; margin-bottom:16px; display:block; color:#a8d5b5;"></i>
+            <p style="font-size:1.1rem;">Tu carrito está vacío</p>
+            <a href="{% url 'catalogo' %}" style="color:#28a745; font-weight:600; text-decoration:none;">
+                <i class="fas fa-book me-1"></i>Ir al catálogo
             </a>
         </div>
-
+        {% endif %}
     </div>
-    {% else %}
-    <div style="text-align:center; padding:60px 20px; color:#6c757d;">
-        <i class="fas fa-shopping-cart" style="font-size:3rem; margin-bottom:16px; display:block; color:#a8d5b5;"></i>
-        <p style="font-size:1.1rem;">Tu carrito está vacío</p>
-        <a href="{% url 'catalogo' %}" style="color:#28a745; font-weight:600; text-decoration:none;">
-            <i class="fas fa-book me-1"></i>Ir al catálogo
-        </a>
-    </div>
-    {% endif %}
-</div>
 </div>
 {% endblock %}

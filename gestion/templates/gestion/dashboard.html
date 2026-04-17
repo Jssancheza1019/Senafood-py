@@ -247,6 +247,7 @@
 
             {% if rol_usuario == 'Cliente' %}
             <a href="{% url 'catalogo' %}"><i class="fas fa-book"></i> Catálogo</a>
+            <a href="{% url 'historial_cliente' %}"><i class="fas fa-receipt"></i> Mis Pedidos</a>
             {% endif %}
 
             {% if rol_usuario != 'Vendedor' and rol_usuario != 'Cajero' %}

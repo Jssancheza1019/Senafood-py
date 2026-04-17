@@ -150,3 +150,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'senafoodcdsf@gmail.com'      # ← tu correo Gmail
 EMAIL_HOST_PASSWORD = 'dsma cgli pplk wqnm'  # ← contraseña de aplicación (ver nota)
 DEFAULT_FROM_EMAIL = 'SenaFood <senafoodcdsf@gmail.com>'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 1800

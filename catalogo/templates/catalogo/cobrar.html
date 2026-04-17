@@ -7,202 +7,197 @@
 
 {% block content %}
 <div id="catalogo-app">
-<div class="container-fluid mt-4 px-4">
+    <div class="container-fluid mt-4 px-4">
 
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
-        <a href="{% url 'vista_vendedor' %}" style="color:#28a745; font-size:1.2rem;">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h4 class="page-title mb-0">
-            <i class="fas fa-money-bill-wave me-2"></i>Cobrar Pedido #{{ carrito.id_carrito }}
-        </h4>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start;">
-
-        <!-- Detalle del pedido -->
-        <div class="carrito-card">
-            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
-                <i class="fas fa-receipt me-2" style="color:#28a745;"></i>
-                Detalle del pedido
-            </h5>
-
-            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0fff4;">
-                <span style="color:#6c757d; font-size:0.85rem;">Cliente:</span>
-                <span style="font-weight:600; margin-left:8px;">
-                    {{ carrito.usuario.nombre }} {{ carrito.usuario.apellido }}
-                </span>
-            </div>
-
-            {% for d in detalles %}
-            <div class="carrito-item">
-                {% if d.id_producto.imagen %}
-                <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
-                {% else %}
-                <div class="carrito-img-placeholder">🍽️</div>
-                {% endif %}
-
-                <div class="carrito-info">
-                    <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
-                    <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
-                </div>
-
-                <div style="text-align:center; min-width:40px;">
-                    <span style="font-weight:600;">x{{ d.cantidad }}</span>
-                </div>
-
-                <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
-            </div>
-            {% endfor %}
-
-            <div class="total-box" style="margin-top:16px;">
-                <span class="total-label">Total a cobrar</span>
-                <span class="total-valor">${{ carrito.total|floatformat:0 }}</span>
-            </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+            <a href="{% url 'vista_vendedor' %}" style="color:#28a745; font-size:1.2rem;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="page-title mb-0">
+                <i class="fas fa-money-bill-wave me-2"></i>Cobrar Pedido #{{ carrito.id_carrito }}
+            </h4>
         </div>
 
-        <!-- Calculadora de cambio -->
-        <div class="carrito-card">
-            <h5 style="color:#2e3b33; font-weight:700; margin-bottom:20px;">
-                <i class="fas fa-calculator me-2" style="color:#28a745;"></i>
-                Calculadora de cambio
-            </h5>
+        <div style="display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start;">
 
-            <div style="margin-bottom:16px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
-                    Total del pedido
-                </label>
-                <div style="background:#f0fff4; border-radius:8px; padding:12px 16px;
-                            font-size:1.3rem; font-weight:700; color:#28a745; text-align:center;">
-                    ${{ carrito.total|floatformat:0 }}
+            <!-- Detalle del pedido -->
+            <div class="carrito-card">
+                <h5 style="color:#2e3b33; font-weight:700; margin-bottom:16px;">
+                    <i class="fas fa-receipt me-2" style="color:#28a745;"></i>
+                    Detalle del pedido
+                </h5>
+
+                <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0fff4;">
+                    <span style="color:#6c757d; font-size:0.85rem;">Cliente:</span>
+                    <span style="font-weight:600; margin-left:8px;">
+                        {{ carrito.usuario.nombre }} {{ carrito.usuario.apellido }}
+                    </span>
+                </div>
+
+                {% for d in detalles %}
+                <div class="carrito-item">
+                    {% if d.id_producto.imagen %}
+                    <img src="{{ d.id_producto.imagen.url }}" class="carrito-img" alt="{{ d.id_producto.nombre }}">
+                    {% else %}
+                    <div class="carrito-img-placeholder">🍽️</div>
+                    {% endif %}
+
+                    <div class="carrito-info">
+                        <div class="carrito-nombre">{{ d.id_producto.nombre }}</div>
+                        <div class="carrito-precio">${{ d.precio_unitario|floatformat:0 }} c/u</div>
+                    </div>
+
+                    <div style="text-align:center; min-width:40px;">
+                        <span style="font-weight:600;">x{{ d.cantidad }}</span>
+                    </div>
+
+                    <div class="carrito-subtotal">${{ d.subtotal|floatformat:0 }}</div>
+                </div>
+                {% endfor %}
+
+                <div class="total-box" style="margin-top:16px;">
+                    <span class="total-label">Total a cobrar</span>
+                    <span class="total-valor">${{ carrito.total|floatformat:0 }}</span>
                 </div>
             </div>
 
-            <div style="margin-bottom:16px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
-                    Valor recibido del cliente
-                </label>
-                <input type="number"
-                    id="valorRecibido"
-                    placeholder="Ingresa el valor..."
-                    min="0"
-                    style="width:100%; padding:12px 16px; border:2px solid #a8d5b5;
-                            border-radius:8px; font-size:1.1rem; font-weight:600;
-                            text-align:center; outline:none; box-sizing:border-box;"
-                    oninput="calcularCambio()">
-            </div>
+            <!-- Calculadora de cambio -->
+            <div class="carrito-card">
+                <h5 style="color:#2e3b33; font-weight:700; margin-bottom:20px;">
+                    <i class="fas fa-calculator me-2" style="color:#28a745;"></i>
+                    Calculadora de cambio
+                </h5>
 
-            <!-- Billetes rápidos -->
-            <div style="margin-bottom:16px;">
-                <label style="font-size:0.82rem; color:#6c757d; display:block; margin-bottom:8px;">
-                    Billetes rápidos
-                </label>
-                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
-                    <button type="button" onclick="setBillete(1000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
+                        Total del pedido
+                    </label>
+                    <div style="background:#f0fff4; border-radius:8px; padding:12px 16px;
+                            font-size:1.3rem; font-weight:700; color:#28a745; text-align:center;">
+                        ${{ carrito.total|floatformat:0 }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
+                        Valor recibido del cliente
+                    </label>
+                    <input type="number" id="valorRecibido" placeholder="Ingresa el valor..." min="0" style="width:100%; padding:12px 16px; border:2px solid #a8d5b5;
+                            border-radius:8px; font-size:1.1rem; font-weight:600;
+                            text-align:center; outline:none; box-sizing:border-box;" oninput="calcularCambio()">
+                </div>
+
+                <!-- Billetes rápidos -->
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:0.82rem; color:#6c757d; display:block; margin-bottom:8px;">
+                        Billetes rápidos
+                    </label>
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
+                        <button type="button" onclick="setBillete(1000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$1.000</button>
-                    <button type="button" onclick="setBillete(2000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                        <button type="button" onclick="setBillete(2000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$2.000</button>
-                    <button type="button" onclick="setBillete(5000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                        <button type="button" onclick="setBillete(5000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$5.000</button>
-                    <button type="button" onclick="setBillete(10000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                        <button type="button" onclick="setBillete(10000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$10.000</button>
-                    <button type="button" onclick="setBillete(20000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                        <button type="button" onclick="setBillete(20000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$20.000</button>
-                    <button type="button" onclick="setBillete(50000)"
-                            style="background:white; border:1px solid #a8d5b5; border-radius:8px;
+                        <button type="button" onclick="setBillete(50000)" style="background:white; border:1px solid #a8d5b5; border-radius:8px;
                                 padding:8px 4px; font-size:0.8rem; font-weight:600;
                                 color:#2e3b33; cursor:pointer;">$50.000</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Cambio -->
-            <div id="cambioBox" style="display:none; margin-bottom:20px;">
-                <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
-                    Cambio a devolver
-                </label>
-                <div id="cambioValor"
-                    style="border-radius:8px; padding:14px 16px; font-size:1.4rem;
+                <!-- Cambio -->
+                <div id="cambioBox" style="display:none; margin-bottom:20px;">
+                    <label style="font-size:0.85rem; font-weight:600; color:#555; display:block; margin-bottom:6px;">
+                        Cambio a devolver
+                    </label>
+                    <div id="cambioValor" style="border-radius:8px; padding:14px 16px; font-size:1.4rem;
                             font-weight:700; text-align:center;">
+                    </div>
                 </div>
-            </div>
 
-            <div id="errorBox" style="display:none; background:#fdecea; color:#dc3545;
+                <div id="errorBox" style="display:none; background:#fdecea; color:#dc3545;
                                     border-radius:8px; padding:10px 14px; font-size:0.85rem;
                                     margin-bottom:16px; text-align:center;">
-                <i class="fas fa-exclamation-triangle me-1"></i>
-                El valor recibido es menor al total
-            </div>
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    El valor recibido es menor al total
+                </div>
 
-            <!-- Botón registrar pago -->
-            <form method="POST" action="{% url 'registrar_pago' carrito.id_carrito %}">
-                {% csrf_token %}
-                <button type="submit" id="btnPagar" disabled
-                        style="background:#ccc; color:white; border:none; padding:14px;
+                <a href="{% url 'cobrar_nequi' carrito.id_carrito %}" style="background:#2d1b69; color:white; border:none; padding:14px;
+                    border-radius:20px; font-size:1rem; font-weight:600;
+                    cursor:pointer; width:100%; display:flex; align-items:center;
+                    justify-content:center; gap:8px; text-decoration:none;
+                    margin-bottom:10px;">
+                    <i class="fas fa-mobile-alt"></i> Cobrar con Nequi
+                </a>
+
+                <!-- Botón registrar pago -->
+                <form method="POST" action="{% url 'registrar_pago' carrito.id_carrito %}">
+                    {% csrf_token %}
+                    <button type="submit" id="btnPagar" disabled style="background:#ccc; color:white; border:none; padding:14px;
                             border-radius:20px; font-size:1rem; font-weight:600;
                             cursor:not-allowed; width:100%; transition:all 0.2s;
                             display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="fas fa-check-circle"></i> Registrar pago en efectivo
-                </button>
-            </form>
-        </div>
+                        <i class="fas fa-check-circle"></i> Registrar pago en efectivo
+                    </button>
+                </form>
+            </div>
 
+        </div>
     </div>
-</div>
 </div>
 
 <script>
     const total = parseFloat("{{ carrito.total }}") || 0;
 
     function calcularCambio() {
-        const recibido    = parseFloat(document.getElementById('valorRecibido').value) || 0;
-        const cambioBox   = document.getElementById('cambioBox');
+        const recibido = parseFloat(document.getElementById('valorRecibido').value) || 0;
+        const cambioBox = document.getElementById('cambioBox');
         const cambioValor = document.getElementById('cambioValor');
-        const errorBox    = document.getElementById('errorBox');
-        const btnPagar    = document.getElementById('btnPagar');
+        const errorBox = document.getElementById('errorBox');
+        const btnPagar = document.getElementById('btnPagar');
 
         if (recibido <= 0) {
-            cambioBox.style.display   = 'none';
-            errorBox.style.display    = 'none';
-            btnPagar.disabled         = true;
+            cambioBox.style.display = 'none';
+            errorBox.style.display = 'none';
+            btnPagar.disabled = true;
             btnPagar.style.background = '#ccc';
-            btnPagar.style.cursor     = 'not-allowed';
+            btnPagar.style.cursor = 'not-allowed';
             return;
         }
 
         if (recibido < total) {
-            cambioBox.style.display   = 'none';
-            errorBox.style.display    = 'block';
-            btnPagar.disabled         = true;
+            cambioBox.style.display = 'none';
+            errorBox.style.display = 'block';
+            btnPagar.disabled = true;
             btnPagar.style.background = '#ccc';
-            btnPagar.style.cursor     = 'not-allowed';
+            btnPagar.style.cursor = 'not-allowed';
         } else {
             const cambio = recibido - total;
-            cambioBox.style.display   = 'block';
-            errorBox.style.display    = 'none';
+            cambioBox.style.display = 'block';
+            errorBox.style.display = 'none';
 
             if (cambio === 0) {
                 cambioValor.style.background = '#e9f7ef';
-                cambioValor.style.color      = '#28a745';
-                cambioValor.textContent      = 'Pago exacto ✓';
+                cambioValor.style.color = '#28a745';
+                cambioValor.textContent = 'Pago exacto ✓';
             } else {
                 cambioValor.style.background = '#fff3e0';
-                cambioValor.style.color      = '#fd7e14';
-                cambioValor.textContent      = '$' + cambio.toLocaleString();
+                cambioValor.style.color = '#fd7e14';
+                cambioValor.textContent = '$' + cambio.toLocaleString();
             }
 
-            btnPagar.disabled         = false;
+            btnPagar.disabled = false;
             btnPagar.style.background = '#28a745';
-            btnPagar.style.cursor     = 'pointer';
+            btnPagar.style.cursor = 'pointer';
         }
     }
 

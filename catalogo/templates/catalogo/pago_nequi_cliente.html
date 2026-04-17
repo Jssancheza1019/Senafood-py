@@ -1,0 +1,64 @@
+{% extends 'gestion/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="catalogo-app">
+    <div style="max-width:480px; margin:40px auto; padding:0 20px;">
+
+        <div class="carrito-card" style="text-align:center;">
+
+            <div style="background:linear-gradient(135deg, #2d1b69, #4a2d8f);
+                    border-radius:12px; padding:24px; margin-bottom:24px;">
+                <div style="color:white; font-size:1.1rem; font-weight:700; margin-bottom:8px;">
+                    🟣 Pago con Nequi
+                </div>
+                <div style="color:#c4b5fd; font-size:0.85rem; margin-bottom:12px;">
+                    Escanea el QR o transfiere al número
+                </div>
+                <div style="color:white; font-size:1.8rem; font-weight:800; letter-spacing:3px;">
+                    310 899 5990
+                </div>
+                <div style="margin-top:14px; color:#4ade80; font-size:1.4rem; font-weight:800;">
+                    ${{ valor|floatformat:0 }}
+                </div>
+                <div style="color:#c4b5fd; font-size:0.78rem; margin-top:4px;">
+                    Valor exacto del pedido #{{ carrito.id_carrito }}
+                </div>
+            </div>
+
+            <!-- QR -->
+            <div style="background:white; border-radius:12px; padding:16px;
+            display:inline-block; box-shadow:0 2px 12px rgba(0,0,0,0.1);
+            margin-bottom:20px;">
+                <img src="{% static 'gestion/img/nequi_qr.png' %}" alt="QR Nequi" style="width:220px; height:220px;">
+            </div>
+
+            <p style="font-size:0.82rem; color:#6c757d; margin-bottom:24px;">
+                Escanea el QR con tu celular para abrir Nequi con el valor exacto prellenado.
+                Cuando completes el pago presiona el botón.
+            </p>
+
+            <!-- Botón confirmar -->
+            <form method="POST" action="{% url 'confirmar_pago_nequi' carrito.id_carrito %}">
+                {% csrf_token %}
+                <button type="submit" style="background:#2d1b69; color:white; border:none; padding:14px;
+                    border-radius:20px; font-size:1rem; font-weight:600;
+                    cursor:pointer; width:100%; display:flex; align-items:center;
+                    justify-content:center; gap:8px; box-sizing:border-box;">
+                    <i class="fas fa-check-circle"></i> Ya pagué — Confirmar pedido
+                </button>
+            </form>
+
+            <a href="{% url 'ver_carrito' %}" style="display:block; margin-top:14px; font-size:0.85rem;
+                color:#6c757d; text-decoration:none;">
+                ← Volver al carrito
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

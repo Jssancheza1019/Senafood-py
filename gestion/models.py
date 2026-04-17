@@ -2,6 +2,7 @@ from django.db import models
 
 from django.db import models
 from pqrs.models import PQRSF
+from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 
 class Usuario(models.Model):
@@ -31,24 +32,25 @@ class Usuario(models.Model):
 
 class Calificacion(models.Model):
     id_calificacion = models.AutoField(primary_key=True)
-    puntuacion = models.IntegerField(blank=True, null=True)
+    puntuacion = models.IntegerField(
+        blank=True, null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
     comentario = models.TextField(blank=True, null=True)
-    
-    # Cambiamos DO_NOTHING por CASCADE y limpiamos el nombre del campo
+    fecha = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
     usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='id_usuario')
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE, db_column='id_producto')
     carrito = models.ForeignKey('Carrito', on_delete=models.CASCADE, db_column='id_carrito')
 
     class Meta:
-        managed = True  # ¡Excelente que ya lo cambiaras!
+        managed = True
         db_table = 'calificacion'
         verbose_name = 'Calificación'
         verbose_name_plural = 'Calificaciones'
 
-    # Esto ayuda a identificar la calificación en el panel de admin
     def __str__(self):
         return f"Calificación {self.puntuacion} - {self.usuario.nombre}"
-
 
 class Carrito(models.Model):
 
